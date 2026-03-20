@@ -2,94 +2,87 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    
     <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#090907">
-    <title>Seed — Sovereign OS</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=IBM+Plex+Mono:wght@300&display=swap" rel="stylesheet">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#101018">
+    <meta name="description" content="Sovereign Media Orchestrator - Animation & Film Deconstruction System">
+    <title>Seed</title>
 
     <style>
         :root {
-            --bg: #090907; --surface: #111110; --border: #2a2a28;
-            --text: #e8e4d9; --gold: #c8a96e;
+            --bg: #101018;
+            --fg: #e0e0e0;
+            --accent: #c8a96e; /* Sovereign Gold */
+            --matrix: #00ff41;
+            --border: #333333;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); font-family: 'Cormorant Garamond', serif; height: 100vh; overflow: hidden; }
 
-        /* VAULT LOCK SCREEN */
-        #lock-screen {
-            position: fixed; inset: 0; background: var(--bg); z-index: 9999;
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--fg); font-family: 'Courier New', monospace; height: 100vh; overflow: hidden; }
+
+        /* AES-256 VAULT UI */
+        #vault {
+            position: fixed; inset: 0; background: var(--bg); z-index: 1000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.8s ease;
         }
-        .vault-seal { font-size: 5rem; color: var(--gold); margin-bottom: 30px; }
-        input[type="password"] {
-            background: transparent; border: none; border-bottom: 1px solid var(--border);
-            color: var(--gold); text-align: center; font-family: 'IBM Plex Mono', monospace;
-            font-size: 1.2rem; outline: none; width: 240px; letter-spacing: 5px;
+        .hex-seal { font-size: 4rem; color: var(--accent); margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--accent)); }
+        input { 
+            background: transparent; border: none; border-bottom: 1px solid var(--border); 
+            color: var(--accent); text-align: center; font-size: 1.2rem; outline: none; width: 260px; letter-spacing: 5px; 
         }
 
-        /* MAIN UI */
-        #app { display: none; height: 100vh; display: flex; flex-direction: column; }
-        nav { padding: 30px; border-bottom: 1px solid var(--border); text-align: center; letter-spacing: 8px; color: var(--gold); }
-
-        /* 21-LENS GRID ⬡ */
-        .lens-container {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-            padding: 20px; max-width: 500px; margin: 20px auto; overflow-y: auto;
-        }
-        .lens-hex {
-            aspect-ratio: 1/1.15; background: var(--surface); border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
+        /* SOVEREIGN GRID ⬡ */
+        #app { display: none; height: 100vh; flex-direction: column; }
+        nav { padding: 20px; border-bottom: 1px solid var(--border); text-align: center; letter-spacing: 8px; color: var(--accent); font-size: 0.8rem; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 25px; overflow-y: auto; flex-grow: 1; }
+        .hex { 
+            aspect-ratio: 1/1.15; background: #1a1a24; border: 1px solid var(--border); 
             clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            font-size: 9px; font-family: 'IBM Plex Mono', monospace; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--fg);
         }
 
         /* SYSTEM B LOGS */
-        #logs {
-            height: 180px; background: rgba(9, 9, 7, 0.98); border-top: 1px solid var(--border);
-            padding: 15px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; overflow-y: auto;
-        }
-        .log-entry { margin-bottom: 4px; border-left: 2px solid var(--gold); padding-left: 8px; }
+        #logs { height: 150px; background: #08080c; border-top: 2px solid var(--border); padding: 15px; font-size: 10px; overflow-y: auto; color: var(--matrix); }
+        .log { margin-bottom: 4px; border-left: 2px solid var(--accent); padding-left: 10px; opacity: 0.8; }
     </style>
 </head>
 <body>
-    <div id="lock-screen">
-        <div class="vault-seal">⬡</div>
-        <input type="password" id="vault-key" placeholder="SECURE_KEY" autofocus>
+    <div id="vault">
+        <div class="hex-seal">⬡</div>
+        <input type="password" id="key" placeholder="SECURE_KEY" autofocus>
     </div>
 
     <div id="app">
         <nav>SOVEREIGN SEED V3.0</nav>
-        <div class="lens-container" id="grid"></div>
+        <div class="grid" id="hex-grid"></div>
         <div id="logs">
-            <div class="log-entry">[C] Librarian linked. LocalStorage verified.</div>
+            <div class="log">[C] SESSION_PRIME INITIALIZED</div>
+            <div class="log">[C] HARDWARE_ANNEXATION ACTIVE</div>
         </div>
     </div>
 
     <script>
         if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
 
+        // 21-Lens ⬡ Mapping
         const lenses = ["TRUTH", "LOGIC", "SAFETY", "DELTA", "AUDIT", "LEAN", "COMPUTE", "LATENCY", "VERBOSITY", "CORE", "VETO", "PLAN", "EXEC", "FIX", "SYNC", "VAULT", "SEED", "SOV", "HEX", "B-SYSTEM", "MAP"];
-        const grid = document.getElementById('grid');
+        const grid = document.getElementById('hex-grid');
         lenses.forEach(l => {
-            const div = document.createElement('div');
-            div.className = 'lens-hex'; div.innerText = l; grid.appendChild(div);
+            const d = document.createElement('div'); d.className = 'hex'; d.innerText = l;
+            grid.appendChild(d);
         });
 
-        const keyInput = document.getElementById('vault-key');
-        keyInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && keyInput.value.length > 0) {
-                document.getElementById('lock-screen').style.opacity = '0';
+        // Decryption Entry
+        const pass = document.getElementById('key');
+        pass.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && pass.value.length > 0) {
+                document.getElementById('vault').style.opacity = '0';
                 setTimeout(() => {
-                    document.getElementById('lock-screen').style.display = 'none';
+                    document.getElementById('vault').style.display = 'none';
                     document.getElementById('app').style.display = 'flex';
                 }, 800);
             }
@@ -97,4 +90,3 @@
     </script>
 </body>
 </html>
-
