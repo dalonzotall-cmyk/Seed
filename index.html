@@ -1129,7 +1129,7 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
 #loaderBar{position:absolute;left:0;top:0;height:100%;background:#c8a96e;border-radius:2px;width:0%;transition:width 0.5s ease;}
 #loaderFill{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,transparent,rgba(200,169,110,0.4),transparent);width:60px;animation:loaderSweep 1.8s ease-in-out infinite;}
 @keyframes loaderSweep{0%{transform:translateX(-60px)}100%{transform:translateX(280px)}}
-@keyframes grow{0%{width:0%}5%{width:8%}15%{width:20%}40%{width:45%}70%{width:65%}90%{width:75%}100%{width:75%}}
+@keyframes grow{0%{width:0%}5%{width:15%}15%{width:35%}35%{width:60%}60%{width:80%}80%{width:92%}95%{width:98%}100%{width:100%}}
 #loaderBar{animation:grow 8s ease-out forwards;}
 </style>
 <div id="seedLoader">
@@ -2073,14 +2073,10 @@ function initApp() {
 
   // PHASE 5: Network-dependent - deferred most
   setTimeout(function() {
-    initFamilySharing();
-    initGroceries();
+    try { initFamilySharing(); } catch(e) { console.log('[SEED] initFamilySharing err:', e.message); }
+    try { initGroceries(); } catch(e) { console.log('[SEED] initGroceries err:', e.message); }
     setLoadProgress(100, 'Ready!');
-    // Remove loader after brief pause so 100% is visible
-    setTimeout(function() {
-      var loader = document.getElementById('seedLoader');
-      if (loader) loader.style.display = 'none';
-    }, 300);
+    // Loader fade handled by setLoadProgress(100)
   }, 300);
 
   // API key prompt
@@ -7068,6 +7064,23 @@ function setLoadProgress(pct, label) {
     var status = document.getElementById('loaderStatus');
     if (pctEl) pctEl.textContent = pct + '%';
     if (status && label) status.textContent = label;
+    // At 100%: force bar to full width, then fade loader
+    if (pct >= 100) {
+      var bar = document.getElementById('loaderBar');
+      if (bar) {
+        bar.style.animation = 'none';
+        bar.style.transition = 'width 0.3s ease';
+        bar.style.width = '100%';
+      }
+      setTimeout(function() {
+        var loader = document.getElementById('seedLoader');
+        if (loader) {
+          loader.style.transition = 'opacity 0.4s ease';
+          loader.style.opacity = '0';
+          setTimeout(function() { loader.style.display = 'none'; }, 400);
+        }
+      }, 300);
+    }
   } catch(e) {}
 }
 
