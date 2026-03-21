@@ -1124,7 +1124,8 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
 <body>
 <!-- SEED LOADER: CSS auto-animates bar so it always moves even before JS -->
 <style>
-#seedLoader{position:fixed;inset:0;background:#090907;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+#seedLoader{position:fixed;inset:0;background:#090907;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;animation:loaderDismiss 12s ease forwards;}
+@keyframes loaderDismiss{0%,85%{opacity:1;pointer-events:auto}95%{opacity:0;pointer-events:none}100%{opacity:0;display:none;pointer-events:none}}
 #loaderTrack{width:220px;height:3px;background:#1a1a18;border-radius:2px;overflow:hidden;position:relative;}
 #loaderBar{position:absolute;left:0;top:0;height:100%;background:#c8a96e;border-radius:2px;width:0%;transition:width 0.5s ease;}
 #loaderFill{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,transparent,rgba(200,169,110,0.4),transparent);width:60px;animation:loaderSweep 1.8s ease-in-out infinite;}
@@ -1926,8 +1927,7 @@ function showInstallFromLanding(platform) {
 // -----------------------------------------------------------
 
 // -- NAV SCROLL ----------------------------------------------
-const nav = document.getElementById('nav');
-window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+// nav scroll removed (landing page element no longer exists)
 
 // -- REVEAL ON SCROLL ----------------------------------------
 const reveals = document.querySelectorAll('.reveal, .titem');
@@ -2013,7 +2013,7 @@ async function doUnlock() {
   app.style.display = 'flex';
   initApp();
 }
-document.getElementById('lockPw').addEventListener('keydown', e => { if (e.key==='Enter') doUnlock(); });
+(function(){ var lp=document.getElementById('lockPw'); if(lp) lp.addEventListener('keydown', function(e){ if(e.key==='Enter') doUnlock(); }); })();
 
 function lockAppFn() {
   CK = null;
@@ -3245,7 +3245,7 @@ function initWildRobot() {
 }
 
 // Run immediately
-initWildRobot();
+try { initWildRobot(); } catch(e) { console.log("[SEED] WR init:", e.message); }
 
 
 
@@ -4387,11 +4387,7 @@ function showAiResponse(text) {
 
 
 
-  import * as webllm from "https://esm.run/@mlc-ai/web-llm";
-  window.WebLLM = webllm;
-  window.WebLLMReady = true;
-  var evt = new CustomEvent('webllm-ready');
-  document.dispatchEvent(evt);
+  // WebLLM loaded via type=module script at body end
 
 // ============================================================
 // FILE UPLOAD SYSTEM
