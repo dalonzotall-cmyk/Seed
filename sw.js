@@ -1,6 +1,6 @@
-// R1-v3 Service Worker — Seed OS
-const CACHE = 'seed-r1v3-v1';
-const CORE = ['/'];
+// Seed OS Service Worker v3 - cache buster
+const CACHE = 'seed-v3';
+const CORE = ['/Seed/', '/Seed/index.html'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
@@ -24,11 +24,11 @@ self.addEventListener('fetch', e => {
   if (!e.request.url.startsWith(self.location.origin)) return;
   e.respondWith(
     caches.match(e.request).then(cached => {
-      if (cached) return cached;
       return fetch(e.request).then(resp => {
-        if (!resp || resp.status !== 200 || resp.type !== 'basic') return resp;
-        const clone = resp.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
+        if (resp && resp.status === 200 && resp.type === 'basic') {
+          const clone = resp.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
         return resp;
       }).catch(() => cached);
     })
