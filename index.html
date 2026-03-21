@@ -2,28 +2,47 @@
 <html lang="en">
 <head>
 <script>
-// SW KILLER - runs first, kills any cached service worker
+// SW KILLER v2 - aggressively kills all cached service workers and caches
 (function() {
   if ('serviceWorker' in navigator) {
+    // Unregister ALL service workers
     navigator.serviceWorker.getRegistrations().then(function(regs) {
       regs.forEach(function(reg) {
-        reg.unregister();
-        console.log('Unregistered SW:', reg.scope);
+        reg.unregister().then(function() {
+          console.log('[SEED] SW killed:', reg.scope);
+        });
       });
+      // If any SW active, tell it to skip waiting
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({type: 'SKIP_WAITING'});
+      }
     });
-    // Also clear all caches
+    // Clear ALL caches without exception
     if ('caches' in window) {
       caches.keys().then(function(names) {
         names.forEach(function(name) {
-          caches.delete(name);
-          console.log('Deleted cache:', name);
+          caches.delete(name).then(function() {
+            console.log('[SEED] Cache cleared:', name);
+          });
         });
       });
+    }
+    // After SW killed, reload once to get fresh page (only if SW was active)
+    if (navigator.serviceWorker.controller) {
+      var reloadKey = 'seed_sw_reloaded';
+      if (!sessionStorage.getItem(reloadKey)) {
+        sessionStorage.setItem(reloadKey, '1');
+        // Short delay then reload to get fresh content
+        setTimeout(function() { location.reload(true); }, 500);
+      }
     }
   }
 })();
 </script>
 <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
