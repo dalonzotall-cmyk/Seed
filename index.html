@@ -2007,12 +2007,21 @@ function showInstallBanner() {
   if (p === 'android' && INSTALL_PROMPT_EVENT) {
     btns.innerHTML = '<button class="install-btn-primary" onclick="triggerAndroidInstall()">&#8681; Add to Home Screen</button>';
     banner.classList.add('on');
+  document.body.style.paddingBottom = '140px';
+  // Auto-dismiss after 10s
+  setTimeout(function() { if (document.getElementById('installBanner').classList.contains('on')) dismissInstall(); }, 10000);
   } else if (p === 'ios') {
     btns.innerHTML = '<button class="install-btn-primary" onclick="showIosSteps()">&#9432; How to Install on iPhone</button>';
     banner.classList.add('on');
+  document.body.style.paddingBottom = '140px';
+  // Auto-dismiss after 10s
+  setTimeout(function() { if (document.getElementById('installBanner').classList.contains('on')) dismissInstall(); }, 10000);
   } else if (INSTALL_PROMPT_EVENT) {
     btns.innerHTML = '<button class="install-btn-primary" onclick="triggerAndroidInstall()">&#8681; Install Seed App</button>';
     banner.classList.add('on');
+  document.body.style.paddingBottom = '140px';
+  // Auto-dismiss after 10s
+  setTimeout(function() { if (document.getElementById('installBanner').classList.contains('on')) dismissInstall(); }, 10000);
   }
 }
 
@@ -2038,9 +2047,9 @@ function showAndroidManual() {
 function dismissInstall() {
   var banner = document.getElementById('installBanner');
   if (banner) banner.classList.remove('on');
+  document.body.style.paddingBottom = '0';
   INSTALL_DISMISSED = true;
   localStorage.setItem('seed_install_dismissed', '1');
-  localStorage.setItem('seed_install_dismissed_time', Date.now().toString());
 }
 
 function showInstallFromLanding(platform) {
@@ -2059,6 +2068,9 @@ function showInstallFromLanding(platform) {
       : '<button class="install-btn-primary" onclick="showAndroidManual()">&#9432; How to Install on Android</button>';
   }
   banner.classList.add('on');
+  document.body.style.paddingBottom = '140px';
+  // Auto-dismiss after 10s
+  setTimeout(function() { if (document.getElementById('installBanner').classList.contains('on')) dismissInstall(); }, 10000);
   if (banner.scrollIntoView) banner.scrollIntoView({behavior:'smooth', block:'end'});
 }
 
@@ -6161,7 +6173,7 @@ function removeGroceryItem(id) {
       </div>
       <div class="install-banner-sub">Install as an app &mdash; runs offline &mdash; no app store needed</div>
     </div>
-    <button class="install-btn-dismiss" onclick="dismissInstall()" aria-label="Dismiss">&times;</button>
+    <button class="install-btn-dismiss" onclick="dismissInstall()" aria-label="Dismiss" style="font-size:18px;padding:6px 12px;font-weight:bold;">&times; Skip</button>
   </div>
   <div class="install-feature-row">
     <div class="install-feature">Offline ready</div>
@@ -6173,6 +6185,11 @@ function removeGroceryItem(id) {
     <!-- Populated by JS based on platform -->
   </div>
   <div class="install-steps" id="installSteps"></div>
+  <div style="text-align:center;margin-top:6px;">
+    <button onclick="dismissInstall()" style="background:none;border:none;color:var(--text-dimmer);font-family:var(--font-m);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;padding:6px 12px;text-decoration:underline;">
+      Skip install — just open the app
+    </button>
+  </div>
 </div>
 
 </body>
