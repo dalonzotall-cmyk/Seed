@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#090907">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="application-name" content="Seed">
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="/Seed/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.svg">
 <link rel="icon" type="image/svg+xml" sizes="192x192" href="/icon-192.svg">
 <title>Seed — Built to amplify what is already in you</title>
@@ -1112,7 +1112,7 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
 <body>
 
 <!-- NAV -->
-<div id="landingPage">
+<div id="landingPage" style="display:none;">
 <nav id="nav">
   <a href="#" class="nav-logo">Seed</a>
   <ul class="nav-links">
@@ -1444,7 +1444,7 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
     </button>
   </div>
 <!-- APP SHELL OVERLAY -->
-<div id="appOverlay" style="display:none;position:fixed;inset:0;z-index:600;background:var(--bg);flex-direction:column;overflow:hidden;">
+<div id="appOverlay" style="display:flex;position:fixed;inset:0;z-index:600;background:var(--bg);flex-direction:column;overflow:hidden;">
 
   <!-- APP TOPBAR -->
   <div style="height:52px;min-height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 14px;flex-shrink:0;">
@@ -2334,7 +2334,7 @@ function showInstallFromLanding(platform) {
 
 if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js').catch(function() {});
+    navigator.serviceWorker.register('/Seed/sw.js').catch(function() {});
   });
 }
 
@@ -7437,17 +7437,20 @@ function switchAcctTab(tab) {
 function autoStart() {
   var params = new URLSearchParams(window.location.search);
 
-  // If ?about=1, show landing page (for sharing/about)
+  // If ?about=1, show landing page instead of app
   if (params.get('about') === '1') {
-    // Show landing page normally - do nothing
+    var lp = document.getElementById('landingPage');
+    if (lp) lp.style.display = 'block';
+    var app = document.getElementById('appOverlay');
+    if (app) app.style.display = 'none';
     return;
   }
 
-  // Check if a password/encryption key was previously set
+  // Check if a password was previously set
   var hasPassword = !!localStorage.getItem(DBKEY);
 
   if (hasPassword) {
-    // User has encrypted data - show lock screen
+    // Show lock screen over the app
     var overlay = document.getElementById('lockOverlay');
     if (overlay) {
       overlay.style.display = 'block';
@@ -7456,7 +7459,7 @@ function autoStart() {
       overlay.style.left = '0';
       overlay.style.right = '0';
       overlay.style.bottom = '0';
-      overlay.style.zIndex = '500';
+      overlay.style.zIndex = '1000';
       overlay.style.background = 'var(--bg)';
       overlay.style.overflowY = 'auto';
     }
@@ -7464,8 +7467,10 @@ function autoStart() {
       var pw = document.getElementById('lockPw');
       if (pw) pw.focus();
     }, 100);
+    // App behind lock - init it
+    launchDirect();
   } else {
-    // No password - launch directly into app
+    // No password - app is already showing, just init it
     launchDirect();
   }
 }
