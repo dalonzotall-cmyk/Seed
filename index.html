@@ -2,39 +2,16 @@
 <html lang="en">
 <head>
 <script>
-// SW KILLER v2 - aggressively kills all cached service workers and caches
+// SW KILLER v3 - kills SW, NO reload (reload caused 0% progress bug)
 (function() {
   if ('serviceWorker' in navigator) {
-    // Unregister ALL service workers
     navigator.serviceWorker.getRegistrations().then(function(regs) {
-      regs.forEach(function(reg) {
-        reg.unregister().then(function() {
-          console.log('[SEED] SW killed:', reg.scope);
-        });
-      });
-      // If any SW active, tell it to skip waiting
-      if (navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({type: 'SKIP_WAITING'});
-      }
+      regs.forEach(function(reg) { reg.unregister(); });
     });
-    // Clear ALL caches without exception
     if ('caches' in window) {
       caches.keys().then(function(names) {
-        names.forEach(function(name) {
-          caches.delete(name).then(function() {
-            console.log('[SEED] Cache cleared:', name);
-          });
-        });
+        names.forEach(function(name) { caches.delete(name); });
       });
-    }
-    // After SW killed, reload once to get fresh page (only if SW was active)
-    if (navigator.serviceWorker.controller) {
-      var reloadKey = 'seed_sw_reloaded';
-      if (!sessionStorage.getItem(reloadKey)) {
-        sessionStorage.setItem(reloadKey, '1');
-        // Short delay then reload to get fresh content
-        setTimeout(function() { location.reload(true); }, 500);
-      }
     }
   }
 })();
@@ -419,7 +396,7 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
   height:2px;background:var(--border);position:relative;overflow:hidden;
 }
 .lap-fill {
-  height:100%;background:var(--green);width:0%;transition:width 0.3s ease;
+  height:100%;background:var(--green);width:5%;transition:width 0.4s ease;
 }
 .lap-label {
   font-size:10px;color:var(--text-dimmer);letter-spacing:0.06em;
@@ -1145,16 +1122,25 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
 </style>
 </head>
 <body>
-<!-- Immediate loading screen - pure CSS, no JS needed -->
-<div id="seedLoader" style="position:fixed;inset:0;background:#090907;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
-  <div style="font-family:Georgia,serif;font-size:48px;font-weight:300;letter-spacing:0.4em;color:#c8a96e;">Seed</div>
-  <div style="font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:#5a5a58;" id="loaderStatus">Initializing...</div>
-  <div style="width:200px;height:2px;background:#1e1e1c;margin-top:4px;border-radius:1px;overflow:hidden;">
-    <div id="loaderBar" style="height:100%;background:#c8a96e;width:0%;transition:width 0.3s ease;"></div>
+<!-- SEED LOADER: CSS auto-animates bar so it always moves even before JS -->
+<style>
+#seedLoader{position:fixed;inset:0;background:#090907;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+#loaderTrack{width:220px;height:3px;background:#1a1a18;border-radius:2px;overflow:hidden;position:relative;}
+#loaderBar{position:absolute;left:0;top:0;height:100%;background:#c8a96e;border-radius:2px;width:0%;transition:width 0.5s ease;}
+#loaderFill{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,transparent,rgba(200,169,110,0.4),transparent);width:60px;animation:loaderSweep 1.8s ease-in-out infinite;}
+@keyframes loaderSweep{0%{transform:translateX(-60px)}100%{transform:translateX(280px)}}
+@keyframes grow{0%{width:0%}5%{width:8%}15%{width:20%}40%{width:45%}70%{width:65%}90%{width:75%}100%{width:75%}}
+#loaderBar{animation:grow 8s ease-out forwards;}
+</style>
+<div id="seedLoader">
+  <div style="font-family:Georgia,serif;font-size:52px;font-weight:300;letter-spacing:0.45em;color:#c8a96e;margin-bottom:4px;">Seed</div>
+  <div id="loaderTrack">
+    <div id="loaderBar"></div>
+    <div id="loaderFill"></div>
   </div>
-  <div id="loaderPct" style="font-size:10px;letter-spacing:0.15em;color:#3a3a38;font-family:monospace;">0%</div>
+  <div id="loaderPct" style="font-size:10px;letter-spacing:0.2em;color:#4a4a48;font-family:monospace;margin-top:2px;">Loading...</div>
+  <div id="loaderStatus" style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:#2a2a28;font-family:monospace;"></div>
 </div>
-<style>@keyframes ld{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}</style>
 
 <!-- NAV -->
 <!-- Landing page removed -->
@@ -7077,12 +7063,12 @@ function switchAcctTab(tab) {
 // LOAD PROGRESS TRACKER
 // ============================================================
 function setLoadProgress(pct, label) {
-  var bar = document.getElementById('loaderBar');
-  var pctEl = document.getElementById('loaderPct');
-  var status = document.getElementById('loaderStatus');
-  if (bar) bar.style.width = pct + '%';
-  if (pctEl) pctEl.textContent = pct + '%';
-  if (status && label) status.textContent = label;
+  try {
+    var pctEl = document.getElementById('loaderPct');
+    var status = document.getElementById('loaderStatus');
+    if (pctEl) pctEl.textContent = pct + '%';
+    if (status && label) status.textContent = label;
+  } catch(e) {}
 }
 
 // ============================================================
