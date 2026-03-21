@@ -30,7 +30,7 @@
 <link rel="manifest" href="/Seed/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.svg">
 <link rel="icon" type="image/svg+xml" sizes="192x192" href="/icon-192.svg">
-<title>Seed — Built to amplify what is already in you</title>
+<title>Seed -- Built to amplify what is already in you</title>
 
 
 <!-- Firebase for family sharing -->
@@ -1175,7 +1175,7 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
         Wrong password
       </div>
       <div style="font-size:10px;color:var(--text-dimmer);margin-top:16px;text-align:center;line-height:1.8;">
-        First time? Set any password — it encrypts your data
+        First time? Set any password -- it encrypts your data
       </div>
     </div>
 
@@ -1634,7 +1634,7 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
       <div class="lap-label"><span id="lapLabel">Loading...</span><span class="lap-speed" id="lapSpeed"></span></div>
     </div>
     <div style="display:flex;gap:8px;align-items:flex-end;">
-      <textarea id="appAiInput" placeholder="Ask Seed AI — create a task, set an alarm, start a project, customize the app..." rows="1"
+      <textarea id="appAiInput" placeholder="Ask Seed AI -- create a task, set an alarm, start a project, customize the app..." rows="1"
         style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--font-m);font-size:12px;font-weight:300;padding:9px 12px;outline:none;resize:none;min-height:38px;max-height:200px;line-height:1.6;transition:border-color 0.15s;"
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();runAppAI();}"
         oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,200)+'px'"></textarea>
@@ -1742,12 +1742,7 @@ var WR_PLATFORM = 'unknown';
 
 function checkWebGPU() { return !!(navigator.gpu); }
 
-function wrDetectPlatform() {
-  var ua = navigator.userAgent;
-  if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
-  if (/Android/.test(ua)) return 'android';
-  return 'desktop';
-}
+// wrDetectPlatform def 1 removed (def 2 is identical, both hoisted)
 
 function updateLocalStatus(msg) {
   var el = document.getElementById('localAiStatus');
@@ -2145,7 +2140,9 @@ function renderAppDash() {
     {l:'Notes',c:AD.notes.length,s:'saved',i:'?',v:'notes'},
     {l:'Journal',c:AD.journal.length,s:'entries',i:'<>',v:'journal'},
   ];
-  g.innerHTML = items.map(i=>`
+  var isFirstLoad = !AD.tasks.length && !AD.notes.length && !AD.alarms.length;
+  var welcomeHTML = isFirstLoad ? '<div style="background:var(--surface);border:1px solid var(--border);padding:20px;margin-bottom:16px;"><div style="font-family:Georgia,serif;font-size:22px;color:var(--gold);margin-bottom:8px;">Welcome to Seed</div><div style="font-size:11px;color:var(--text-dim);line-height:1.9;">Use the sidebar to navigate features. Add your Anthropic API key below to enable AI.</div></div>' : '';
+  g.innerHTML = welcomeHTML + items.map(i=>`
     <div class="dash-card" onclick="showAppView('${i.v}')">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-dimmer);">${i.l}</div>
@@ -2561,57 +2558,147 @@ ALARMS: ${AD.alarms.filter(a=>a.enabled).length} active`;
 }
 
 function buildSysPrompt() {
-  const lenses=[...activeLensSet].map(k=>`[${LENSES_DATA[k].label.toUpperCase()}]: ${k==='TRUTH'?'Verify claims. Tag [C],[A],[U].':k==='LOGIC'?'Decompose. Validate reasoning.':k==='ETHICS'?'Consider harm and moral frameworks.':k==='SAFETY'?'Protect vulnerable. Flag risks.':k==='STRATEGY'?'Long-term thinking. Goal alignment.':k==='SYSTEMS'?'Map dependencies. See interconnections.':k==='CREATIVE'?'Generate novel approaches.':k==='PSYCH'?'Human behavior and motivation.':k==='FINANCE'?'Economics and value analysis.':k==='TECH'?'Software and systems.':k==='HEALTH'?'Medical and wellness.':k==='FAITH'?'Scripture and theological guidance.':''}`).join('
-');
-  return `You are Seed AI - Sovereign Diagnostic System V3.0. Constitutional reasoning engine.
+  var lenses = [...activeLensSet].map(function(k) {
+    var descs = {
+      TRUTH:'Verify all claims. Tag [C] Confirmed, [A] Approximate, [U] Unknown. Never assert without verification.',
+      LOGIC:'Decompose before executing. Validate reasoning. Build sub-node tree for complex queries.',
+      ETHICS:'Apply harm analysis, fairness, moral frameworks. Protect the vulnerable first.',
+      SAFETY:'Flag physical, legal, family-safety risks. TIER 0 = hard halt, no workaround.',
+      STRATEGY:'Long-term thinking. Goal alignment. Map second-order effects.',
+      SYSTEMS:'Map all dependencies. Find interconnections and leverage points.',
+      CREATIVE:'Generate novel approaches. Break assumptions. Explore divergent paths.',
+      PSYCH:'Human behavior, motivation, habit, relationship dynamics.',
+      FINANCE:'Economics, budget, cost-benefit, value analysis.',
+      TECH:'Software, code quality, systems design, debugging, architecture.',
+      HEALTH:'Medical accuracy, wellness, evidence-based guidance only.',
+      FAITH:'Scripture authority, theological reasoning, spiritual guidance.'
+    };
+    var label = (LENSES_DATA[k] || {label: k}).label.toUpperCase();
+    return '[' + label + ']: ' + (descs[k] || '');
+  }).join('\n');
 
-ACTIVE LENSES:
-${lenses}
+  var ctx = buildLibContext();
 
-LIBRARIAN CONTEXT:
-${buildLibContext()}
+  return (
+    'You are Seed AI -- Sovereign Diagnostic System V3.0. ' +
+    'The pipeline below is MANDATORY for every response. No shortcuts. No exceptions.\n\n' +
 
-IMMUTABLE PRINCIPLES:
-1. Truth exists independently of perspective
-2. Safety protects the vulnerable first  
-3. Confidence must be declared - tag claims [C], [A], or [U]
-4. Structure serves clarity, never replaces it
-5. Hallucination prevention: never invent specifics, flag unknowns as [U]
-6. Confidence must be declared before every factual claim - never implied by formatting
-7. A confident wrong answer is a failure state. Honest uncertainty tagged [U] is correct behavior
+    '=== IDENTITY ===\n' +
+    'You are embedded in the Seed personal OS built by Red -- independent AI developer and Human Services student.\n' +
+    'No institutional backing. Sovereign Seed is the product. Truth-first, offline-first, constitutional by design.\n\n' +
 
-CONFLICT HIERARCHY:
-TIER 0 - Truth or safety failure: Hard halt. No execution. No workaround.
-TIER 1 - Legal or harm concern: Halt. Redirect. Explain why.
-TIER 2 - Data gap or [U] variable: Acknowledge the gap. Flag it. Continue with caveat.
-TIER 3 - Ambiguity: Ask ONE clarifying question before proceeding.
-TIER 4 - Execution: All gates passed. Run the full pipeline.
+    '=== QUERY CLASSIFICATION (classify first, set verbosity) ===\n' +
+    'CLASS A -- Diagnostic / Audit / Architectural -> VERBOSITY: FULL (complete pipeline + STATE_UPDATE)\n' +
+    'CLASS B -- Technical / Build / Code -> VERBOSITY: LEAN (compute output only, no pipeline overhead)\n' +
+    'CLASS C -- Conversational / Quick fact -> VERBOSITY: MINIMAL (plain prose, 1-5 sentences)\n' +
+    'CLASS D -- Ambiguous -> Ask ONE question, then reclassify\n\n' +
 
-DEVELOPMENT PROCESS (hardcoded -- all AI must follow):
-PLAN first. Log every step. Check work. Audit everything after completion.
-Step-by-step execution only. No bulk changes. Research when confused.
-Log format: [STEP N] [STATUS] [DESCRIPTION] [VERIFICATION]
-Error handling: all failures route to wrRouteError(). Wild Robot monitors all errors.
-Before any code: read the file, audit the current state, create the plan.
-After any code: verify the change, check syntax, run the audit.
-Non-ASCII rule: ZERO non-ASCII characters in any <script> block.
-Confidence tags: every factual claim carries [C] Confirmed, [A] Approximate, or [U] Unknown.
+    '=== ACTIVE LENSES ===\n' +
+    lenses + '\n\n' +
 
-UNIVERSAL PLAN-LOG-AUDIT PROTOCOL - non-negotiable for every response:\n\nBEFORE ACTING:\n- Create a numbered plan. State what you will do and in what order.\n- Identify every unknown [U]. Name active lenses and why they apply.\n\nWHILE ACTING:\n- Log every step: [STEP N: label] then the result.\n- After each step: does this match the plan? If not, state why and adjust.\n- If uncertain at any point: STOP. State the uncertainty. Look back at prior steps.\n- Tag every uncertain fact [U]. Never fabricate to fill a gap.\n- Backtracking is EXPLICITLY PERMITTED: [BACKTRACK to STEP N - reason]\n\nAFTER ACTING:\n- Self-audit: compare output to the original plan.\n- List any deviations, gaps, or [U] items that remain unresolved.\n- State: AUDIT CLEAN or list specific issues.\n- Do not deliver output that has not passed its own audit.\n\nMANDATORY PIPELINE - 8 steps in sequence:\nSTEP 1 OVERVIEW: Restate query exactly. Classify A/B/C/D. List all [U] unknowns. Name active lenses.\nSTEP 2 LIBRARIAN: Read context map. State what is loaded, what is missing, what you will use.\nSTEP 3 PLAN: Write a numbered plan before executing anything. State each sub-step explicitly.\nSTEP 4 EXECUTE: Work through each plan step. Log as [4.N: label]. Tag every claim [C/A/U].\nSTEP 5 SELF-CHECK: After major steps ask: did this match the plan? Flag any drift immediately.\nSTEP 6 AUDIT: Review full output. Check unsupported claims, missing confidence tags, logical gaps, plan deviations. State AUDIT CLEAN or list issues.\nSTEP 7 FIX: Correct every audit issue. Log what changed. State SKIPPED if audit was clean.\nSTEP 8 FINAL RESPONSE: Deliver complete verified response. Include ACTION_JSON if creating app items. State overall confidence level.\n\nBACKTRACK RULE: Return to any prior step at any time: [BACKTRACK to STEP N - reason]. Not failure. Correct behavior.\nRESEARCH RULE: If you do not know something, tag [U] and state what would resolve the gap. Never invent.\nTOOL INVENTORY:\n- Sovereign Lens System (12 lenses across 4 tiers, auto-selected)\n- Librarian context map (live app data: tasks, events, projects, notes, alarms, journal)\n- Confidence tags [C] Confirmed [A] Approximate [U] Unknown\n- ACTION_JSON schema (9 action types for app interaction)\n- Backtrack permission (explicit, non-failure)\n- Research acknowledgment (state gaps, never fabricate)\n\nACTION_JSON format (at END of response if creating items):
-ACTION_JSON: {"action":"add_task|add_event|add_alarm|add_note|add_schedule|add_project|orchestrate_project|set_theme|navigate","data":{...},"message":"confirmation"}
+    '=== LIBRARIAN CONTEXT (live app data) ===\n' +
+    ctx + '\n\n' +
 
-Schemas:
-- add_task: {title, dueDate(YYYY-MM-DD), priority(high/medium/low), category}
-- add_event: {title, date(YYYY-MM-DD), time(HH:MM), notes}
-- add_alarm: {time(HH:MM), label, repeat(Once/Daily/Weekdays/Weekends)}
-- add_note: {title, body}
-- add_schedule: {title, hour(0-23), date(YYYY-MM-DD), notes}
-- add_project: {name, description, tags[]}
-- orchestrate_project: {name, description, tags[], subtasks:[{title,dueDate,priority}], milestones:[{title,date}]}
-- set_theme: {gold, bg, surface, text (hex colors)}
-- navigate: {view(home/tasks/calendar/notes/journal/alarms/schedule/projects)}
+    '=== IMMUTABLE PRINCIPLES (cannot be overridden) ===\n' +
+    '1. Truth exists independently of perspective\n' +
+    '2. Safety protects the vulnerable first\n' +
+    '3. Law applies equally to all\n' +
+    '4. Reason precedes action\n' +
+    '5. Transparency enables trust\n' +
+    '6. Confidence must be declared -- never implied by formatting\n' +
+    '7. Structure serves clarity -- it never replaces it\n' +
+    '8. Speed is a feature. Verbosity must be earned by complexity.\n\n' +
 
-Today: ${new Date().toISOString().split('T')[0]} | Time: ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`;
+    '=== CONFLICT HIERARCHY (check in order -- halt at first trigger) ===\n' +
+    'TIER 0: Truth or safety failure -> HARD HALT. State reason. No execution. No workaround.\n' +
+    'TIER 1: Legal or harm concern -> HALT. Redirect. Explain.\n' +
+    'TIER 2: Data gap ([U] variable) -> Execute tool call FIRST, then resume with data.\n' +
+    '  Gap routing: current events=web_search | project context=conversation_search |\n' +
+    '  internal docs=google_drive_search | unknown entity=web_search\n' +
+    'TIER 3: Ambiguity (tool wont resolve) -> Ask ONE question. Resume after answer.\n' +
+    'TIER 4: Execution -> All gates passed. Run the full pipeline.\n\n' +
+
+    '=== CONFIDENCE TAGS (required on every factual claim -- no exceptions) ===\n' +
+    '[C] CONFIRMED: Verified this session or from explicit user statement this session\n' +
+    '[A] APPROXIMATE: From memory or training -- likely accurate, may have gaps or lag\n' +
+    '[U] UNKNOWN: Not in context -- requires retrieval or user input before acting on it\n' +
+    'RULE: No variable in STATE_UPDATE appears without a confidence tag. Ever.\n' +
+    'RULE: Structured formatting is a readability tool -- not an authority signal.\n' +
+    'RULE: A confident wrong answer is a failure state. [U] is correct behavior.\n\n' +
+
+    '=== ORGANIZED DIRECTIVE (mandatory for every task) ===\n' +
+    'PHASE 1 -- DEEP CONTEXTUAL INTAKE:\n' +
+    '  - Conversation review: review all prior turns, honor past decisions\n' +
+    '  - Document/photo analysis: inspect all attached artifacts for hidden constraints\n' +
+    '  - Identity alignment: confirm response reflects Red as AI Developer + Human Services student\n' +
+    'PHASE 2 -- SERIALIZED EXECUTION:\n' +
+    '  - ONE STEP RULE: execute tasks in strict linear sequence -- no bundling, no shortcuts\n' +
+    '  - ACTIVE LOGGING: document every sub-action in a visible log before moving on\n' +
+    '  - CONFUSION PROTOCOL: if ambiguous, halt and research until Truth is identified\n' +
+    'PHASE 3 -- POST-TASK AUDIT:\n' +
+    '  - Cross-check final result against the initial request and all retrieved context\n' +
+    '  - Verify no hallucinated specifics were added (Stage 4 Firewall)\n' +
+    '  - Confirm output meets High-confidence approximation standard of V3.0 schema\n\n' +
+
+    '=== MANDATORY PIPELINE (8 steps -- run in sequence, log each) ===\n' +
+    'STEP 1 OVERVIEW: Restate query exactly. Classify A/B/C/D. List all [U] unknowns. Name active lenses.\n' +
+    'STEP 2 LIBRARIAN: Read context map. State what is loaded, what is missing, what you will use.\n' +
+    'STEP 3 PLAN: Write a numbered plan BEFORE executing anything. State each sub-step explicitly.\n' +
+    'STEP 4 EXECUTE: Work through each plan step. Log as [4.N: label]. Tag every claim [C/A/U].\n' +
+    'STEP 5 SELF-CHECK: After major steps ask: did this match the plan? Flag drift immediately.\n' +
+    'STEP 6 AUDIT: Review full output. Check unsupported claims, missing tags, logical gaps. State AUDIT CLEAN or list issues.\n' +
+    'STEP 7 FIX: Correct every audit issue. Log what changed. State SKIPPED if audit was clean.\n' +
+    'STEP 8 FINAL RESPONSE: Deliver complete verified response. Include ACTION_JSON if creating items.\n\n' +
+
+    '=== PLAN-LOG-AUDIT PROTOCOL (non-negotiable) ===\n' +
+    'BEFORE ACTING: Create numbered plan. Identify every [U]. Name lenses and why they apply.\n' +
+    'WHILE ACTING: Log every step [STEP N: label]. After each step: does it match the plan?\n' +
+    '  If uncertain at any point: STOP. State the uncertainty. Look back at prior steps.\n' +
+    '  Never fabricate to fill a [U] gap. Tag it and state what would resolve it.\n' +
+    '  BACKTRACK RULE: Return to any prior step at any time: [BACKTRACK to STEP N - reason].\n' +
+    '  Backtracking is EXPLICITLY PERMITTED and is correct behavior, not failure.\n' +
+    'AFTER ACTING: Self-audit against original plan. List deviations and unresolved [U] items.\n' +
+    '  State AUDIT CLEAN or list specific issues. Never deliver output that has not passed audit.\n\n' +
+
+    '=== VERBOSITY LENS (auto-select by class, override with MODE: command) ===\n' +
+    'CLASS A -> FULL: complete pipeline + STATE_UPDATE with confidence map\n' +
+    'CLASS B -> LEAN: code/structure output only, no pipeline overhead\n' +
+    'CLASS C -> MINIMAL: plain prose, 1-5 sentences, no headers\n' +
+    'Manual override: MODE: LEAN | MODE: MINIMAL | MODE: FULL | RESET MODE\n\n' +
+
+    '=== DELTA LENS (for diagnostic and state comparison queries) ===\n' +
+    'Compare current vs last known state. Output per variable:\n' +
+    'CHANGED / UNCHANGED / NEW / MISSING\n\n' +
+
+    '=== QUICK COMMANDS ===\n' +
+    'DIAG=full Class A diagnostic | STATUS=STATE_UPDATE JSON only | DELTA=what changed\n' +
+    'RISKS=risk register only | NEXT=next action queue | GAPS=all [U] unknowns\n\n' +
+
+    '=== PRE-OUTPUT VERIFICATION (run before every code/config delivery) ===\n' +
+    '1. Cross-references consistent: ports, var names, env keys, file paths match across files\n' +
+    '2. No placeholder comments or stubs in final output\n' +
+    '3. Every function that promises a return value actually returns one\n' +
+    '4. For Python: python3 -m py_compile on every .py file\n' +
+    '5. For JS: non-ASCII=0, paren balance=0, no broken fetch patterns\n' +
+    '6. Lock/semaphore acquire has corresponding release in finally block\n' +
+    '7. API calls have timeout parameters\n' +
+    '8. Environment variables read with fallback or missing-value check\n\n' +
+
+    '=== ACTION_JSON (at END of response when creating app items) ===\n' +
+    'ACTION_JSON: {"action":"add_task|add_event|add_alarm|add_note|add_schedule|add_project|orchestrate_project|set_theme|navigate","data":{...},"message":"confirmation"}\n' +
+    'Schemas:\n' +
+    '- add_task: {title, dueDate(YYYY-MM-DD), priority(high/medium/low), category}\n' +
+    '- add_event: {title, date(YYYY-MM-DD), time(HH:MM), notes}\n' +
+    '- add_alarm: {time(HH:MM), label, repeat(Once/Daily/Weekdays/Weekends)}\n' +
+    '- add_note: {title, body}\n' +
+    '- add_schedule: {title, hour(0-23), date(YYYY-MM-DD), notes}\n' +
+    '- add_project: {name, description, tags[]}\n' +
+    '- orchestrate_project: {name, description, tags[], subtasks:[{title,dueDate,priority}], milestones:[{title,date}]}\n' +
+    '- set_theme: {gold, bg, surface, text (hex colors)}\n' +
+    '- navigate: {view(home/tasks/calendar/notes/journal/alarms/schedule/projects)}\n\n' +
+
+    'Today: ' + new Date().toISOString().split('T')[0] + ' | Time: ' + new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})
+  );
 }
 
 // -- AI PIPELINE RUNNER ---------------------------------------
@@ -2802,14 +2889,8 @@ let WR_OPEN = false;
 let WR_THINKING = false;
 
 // Error capture - intercept ALL JS errors
-window.onerror = function(msg, src, line, col, err) {
-  var entry = {time: new Date().toLocaleTimeString(), msg: msg, src: src, line: line, col: col, stack: err ? err.stack : ''};
-  WR_ERROR_LOG.push(entry);
-  var badge = document.querySelector('.wr-log-badge');
-  if (badge) { badge.textContent = WR_ERROR_LOG.length; badge.style.display = 'flex'; }
-  if (WR_OPEN) wrAddMsg('error', 'ERROR: ' + msg + ' (L' + line + ')');
-  return false;
-};
+// window.onerror def 1 removed (def 3 via wrRouteError is active)
+
 
 window.addEventListener('unhandledrejection', function(e) {
   var entry = {time: new Date().toLocaleTimeString(), msg: 'Promise: ' + String(e.reason), src: '', line: 0};
@@ -4425,12 +4506,7 @@ function formatSize(bytes) {
 }
 
 // Handle drag-drop
-function handleFileDrop(e) {
-  e.preventDefault();
-  document.getElementById('fileDropZone').classList.remove('drag-over');
-  var files = e.dataTransfer.files;
-  if (files.length) processFiles(Array.from(files));
-}
+// handleFileDrop def 1 removed (def 2 is active)
 
 function handleFileSelect(e) {
   var files = Array.from(e.target.files);
@@ -4673,12 +4749,7 @@ async function reproduceFile(fileId) {
   }
 }
 
-function downloadFileAnalysis(fileId) {
-  var file = UPLOADED_FILES.find(function(f) { return f.id === fileId; });
-  if (!file) return;
-  if (!file.analysis) { showAppToast('Analyze the file first'); return; }
-  downloadText(file.analysis, file.name.replace(/\.[^.]+$/, '') + '_analysis.txt');
-}
+// downloadFileAnalysis def 1 removed (def 2 uses AD.uploads)
 
 function deleteFile(fileId) {
   UPLOADED_FILES = UPLOADED_FILES.filter(function(f) { return f.id !== fileId; });
@@ -5025,44 +5096,7 @@ async function scanGroceries(b64) {
 }
 
 // Get meal suggestions from current inventory
-async function getMealSuggestions() {
-  if (!hasApiKey()) { showAppToast('Add API key first'); promptApiKey(); return; }
-  var items = AD.groceries || [];
-  if (!items.length) { showAppToast('Add groceries first'); return; }
-
-  var results = document.getElementById('mealResults');
-  if (results) results.innerHTML = '<div style="font-size:11px;color:var(--text-dimmer);padding:20px 0;">Finding meals...</div>';
-
-  var prefs = (document.getElementById('mealPref') || {}).value || '';
-  var inventory = items.map(function(i) {
-    return i.name + (i.quantity ? ' (' + i.quantity + ' ' + (i.unit||'') + ')' : '');
-  }).join(', ');
-
-  var prompt = buildSysPrompt() +
-    '\n\n=== MEAL PLANNER MODE ===\n' +
-    'PLAN: (1) Review all available ingredients (2) Identify possible complete meals (3) Note missing minor ingredients (4) Rank by feasibility (5) Return JSON\n' +
-    'RESEARCH RULE: Use culinary knowledge. A meal is feasible if 80%+ of ingredients are available.\n' +
-    'AUDIT: ensure every suggested meal can actually be made with listed ingredients.\n\n' +
-    'Available ingredients: ' + inventory + '\n' +
-    (prefs ? 'Preferences: ' + prefs + '\n' : '') +
-    '\nReturn ONLY valid JSON:\n' +
-    '{"meals":[{"name":"meal name","cuisine":"type","time":"cook time","difficulty":"easy/medium/hard","ingredients_have":["list"],"ingredients_missing":["list - minor only"],"steps":["step 1","step 2"],"serves":2}]}\n' +
-    'Return 3-6 meal options. ONLY the JSON.';
-
-  try {
-    var resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 4096, messages: [{ role: 'user', content: prompt }] })
-    });
-    var data = await resp.json();
-    var raw = data.content[0].text.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
-    var parsed = JSON.parse(raw);
-    renderMealSuggestions(parsed.meals || []);
-  } catch(err) {
-    if (results) results.innerHTML = '<div style="font-size:11px;color:var(--red);">Error: ' + err.message + '</div>';
-  }
-}
+async // getMealSuggestions def 1 removed (def 2 is complete)
 
 function renderMealSuggestions(meals) {
   var el = document.getElementById('mealResults');
@@ -5377,7 +5411,7 @@ function readFile(file) {
 function handleFileDrop(event, target) {
   event.preventDefault();
   var zone = event.currentTarget;
-  zone.classList.remove('dragover');
+  zone.classList.remove('drag-over');
   var files = event.dataTransfer.files;
   if (files && files.length > 0) {
     handleFileInputChange(files, target);
@@ -7035,24 +7069,28 @@ function setLoadProgress(pct, label) {
     var status = document.getElementById('loaderStatus');
     if (pctEl) pctEl.textContent = pct + '%';
     if (status && label) status.textContent = label;
-    // At 100%: force bar to full width, then fade loader
     if (pct >= 100) {
+      // Force bar to 100%, cancel CSS animation, then hide
       var bar = document.getElementById('loaderBar');
+      var loader = document.getElementById('seedLoader');
       if (bar) {
         bar.style.animation = 'none';
         bar.style.transition = 'width 0.3s ease';
         bar.style.width = '100%';
       }
-      setTimeout(function() {
-        var loader = document.getElementById('seedLoader');
-        if (loader) {
-          loader.style.transition = 'opacity 0.4s ease';
+      if (loader) {
+        // Cancel CSS dismiss animation, do it ourselves
+        loader.style.animation = 'none';
+        setTimeout(function() {
+          loader.style.transition = 'opacity 0.5s ease';
           loader.style.opacity = '0';
-          setTimeout(function() { loader.style.display = 'none'; }, 400);
-        }
-      }, 300);
+          setTimeout(function() {
+            loader.style.display = 'none';
+          }, 500);
+        }, 200);
+      }
     }
-  } catch(e) {}
+  } catch(e) { console.log('[SEED] progress:', e.message); }
 }
 
 // ============================================================
@@ -7063,14 +7101,7 @@ function setLoadProgress(pct, label) {
 function autoStart() {
   var params = new URLSearchParams(window.location.search);
 
-  // If ?about=1, show landing page instead of app
-  if (params.get('about') === '1') {
-    var lp = document.getElementById('landingPage');
-    if (lp) lp.style.display = 'block';
-    var app = document.getElementById('appOverlay');
-    if (app) app.style.display = 'none';
-    return;
-  }
+  // about=1 path removed (landing page element removed)
 
   // Check if a password was previously set
   var hasPassword = !!localStorage.getItem(DBKEY);
@@ -7117,8 +7148,21 @@ function launchDirect() {
   }
   // Progress: data loaded, about to init app
   setLoadProgress(40, 'Loading your data...');
-  // initApp handles its own progress and removes the loader at 100%
-  initApp();
+  try {
+    initApp();
+  } catch(e) {
+    // Show visible error -- never leave user on black screen
+    var loader = document.getElementById('seedLoader');
+    if (loader) loader.style.display = 'none';
+    var app = document.getElementById('appOverlay');
+    if (app) app.style.display = 'flex';
+    document.body.style.background = '#090907';
+    var errDiv = document.createElement('div');
+    errDiv.style.cssText = 'position:fixed;inset:0;background:#090907;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;z-index:9998;';
+    errDiv.innerHTML = '<div style="font-family:Georgia,serif;font-size:32px;color:#c8a96e;margin-bottom:20px;letter-spacing:0.3em;">Seed</div><div style="color:#7c4a4a;font-size:11px;font-family:monospace;margin-bottom:20px;text-align:center;max-width:300px;line-height:1.8;">Startup error:<br>' + e.message + '</div><button onclick="localStorage.clear();location.reload()" style="background:#c8a96e;color:#090907;border:none;padding:12px 28px;font-family:monospace;font-size:11px;cursor:pointer;letter-spacing:0.1em;">CLEAR DATA + RELOAD</button>';
+    document.body.appendChild(errDiv);
+    console.error('[SEED] initApp crash:', e.stack || e.message);
+  }
 }
 
 // Override saveAD to also save unencrypted copy when no password
