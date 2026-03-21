@@ -1145,13 +1145,14 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
 </style>
 </head>
 <body>
-<!-- Immediate loading screen - pure CSS, no JS needed, removes when app loads -->
-<div id="seedLoader" style="position:fixed;inset:0;background:#090907;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+<!-- Immediate loading screen - pure CSS, no JS needed -->
+<div id="seedLoader" style="position:fixed;inset:0;background:#090907;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
   <div style="font-family:Georgia,serif;font-size:48px;font-weight:300;letter-spacing:0.4em;color:#c8a96e;">Seed</div>
-  <div style="font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:#5a5a58;">Loading...</div>
-  <div style="width:120px;height:1px;background:#1e1e1c;margin-top:8px;overflow:hidden;">
-    <div style="height:100%;background:#c8a96e;animation:ld 1.5s ease-in-out infinite;width:40%;"></div>
+  <div style="font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:#5a5a58;" id="loaderStatus">Initializing...</div>
+  <div style="width:200px;height:2px;background:#1e1e1c;margin-top:4px;border-radius:1px;overflow:hidden;">
+    <div id="loaderBar" style="height:100%;background:#c8a96e;width:0%;transition:width 0.3s ease;"></div>
   </div>
+  <div id="loaderPct" style="font-size:10px;letter-spacing:0.15em;color:#3a3a38;font-family:monospace;">0%</div>
 </div>
 <style>@keyframes ld{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}</style>
 
@@ -2039,36 +2040,77 @@ function lockAppFn() {
 
 // -- APP INIT -------------------------------------------------
 function initApp() {
-  tickClock(); setInterval(tickClock, 1000);
+  // PHASE 1: Immediate - clock, greeting, home view only
+  setLoadProgress(50, 'Starting up...');
+  tickClock();
+  setInterval(tickClock, 1000);
   setInterval(checkAppAlarms, 30000);
   updateAppGreeting();
-  renderAppDash(); renderAppTasks(); renderAppCal(); renderAppNotes();
-  renderAppSchedule(); renderAppJournal(); renderAppAlarms(); renderAppProjects();
+
+  // Only render the HOME view immediately - user sees this first
+  setLoadProgress(60, 'Loading dashboard...');
+  renderAppDash();
+
+  // Apply theme
   applyAppTheme(AD.settings.theme || {});
-  if (AD.settings.theme) applyAppTheme(AD.settings.theme);
+
+  // PHASE 2: Core init - fast, no network
+  setLoadProgress(70, 'Setting up AI...');
   updateApiIndicator();
   initAiMode();
-  initExtensions();
   initExpandableMessages();
-  initNotifications();
-  initAccount();
-  initFamilySharing();
-  initGroceries();
-  // Show API key prompt if not set
+
+  // PHASE 3: Deferred renders - happens after first paint (0ms timeout = next frame)
+  setLoadProgress(80, 'Loading features...');
+  setTimeout(function() {
+    renderAppTasks();
+    renderAppCal();
+    renderAppNotes();
+    setLoadProgress(88, 'Almost there...');
+  }, 0);
+
+  setTimeout(function() {
+    renderAppSchedule();
+    renderAppJournal();
+    renderAppAlarms();
+    renderAppProjects();
+    setLoadProgress(94, 'Finalizing...');
+  }, 50);
+
+  // PHASE 4: Extensions - slightly deferred
+  setTimeout(function() {
+    initExtensions();
+    initAccount();
+    initNotifications();
+    setLoadProgress(98, 'Ready!');
+  }, 100);
+
+  // PHASE 5: Network-dependent - deferred most
+  setTimeout(function() {
+    initFamilySharing();
+    initGroceries();
+    setLoadProgress(100, 'Ready!');
+    // Remove loader after brief pause so 100% is visible
+    setTimeout(function() {
+      var loader = document.getElementById('seedLoader');
+      if (loader) loader.style.display = 'none';
+    }, 300);
+  }, 300);
+
+  // API key prompt
   if (!hasApiKey()) {
     setTimeout(function() {
       showAppToast('Add your Anthropic API key to use Seed AI');
-    // Gentle account note after 4 seconds
-    if (!ACCT_USER && !localStorage.getItem('acct_noted')) {
-      setTimeout(function() {
-        localStorage.setItem('acct_noted', '1');
-        var ind = document.getElementById('acctIndicator');
-        if (ind) {
-          ind.style.borderColor = 'var(--gold)';
-          ind.title = 'Create a free account to save your data across devices';
-        }
-      }, 4000);
-    }
+      if (!ACCT_USER && !localStorage.getItem('acct_noted')) {
+        setTimeout(function() {
+          localStorage.setItem('acct_noted', '1');
+          var ind = document.getElementById('acctIndicator');
+          if (ind) {
+            ind.style.borderColor = 'var(--gold)';
+            ind.title = 'Create a free account to save your data across devices';
+          }
+        }, 4000);
+      }
       var keyBtn = document.getElementById('sni-apikey');
       if (keyBtn) { keyBtn.style.borderLeft = '2px solid var(--gold)'; keyBtn.style.color = 'var(--gold)'; }
     }, 1200);
@@ -7030,6 +7072,19 @@ function switchAcctTab(tab) {
 
 
 
+
+// ============================================================
+// LOAD PROGRESS TRACKER
+// ============================================================
+function setLoadProgress(pct, label) {
+  var bar = document.getElementById('loaderBar');
+  var pctEl = document.getElementById('loaderPct');
+  var status = document.getElementById('loaderStatus');
+  if (bar) bar.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
+  if (status && label) status.textContent = label;
+}
+
 // ============================================================
 // AUTO-START: Skip lock screen if no password set
 // Show landing page only if ?about=1 in URL
@@ -7072,6 +7127,7 @@ function autoStart() {
     launchDirect();
   } else {
     // No password - app is already showing, just init it
+    setLoadProgress(30, 'Loading your data...');
     launchDirect();
   }
 }
@@ -7089,9 +7145,9 @@ function launchDirect() {
   if (app) {
     app.style.display = 'flex';
   }
-  // Remove loading screen
-  var loader = document.getElementById('seedLoader');
-  if (loader) loader.style.display = 'none';
+  // Progress: data loaded, about to init app
+  setLoadProgress(40, 'Loading your data...');
+  // initApp handles its own progress and removes the loader at 100%
   initApp();
 }
 
@@ -7126,8 +7182,10 @@ function handleViewParam() {
 // Run on DOM ready
 document.addEventListener('DOMContentLoaded', function() {
   try {
+    setLoadProgress(10, 'Starting...');
     initSaveHook();
     handleViewParam();
+    setLoadProgress(20, 'Checking session...');
     autoStart();
   } catch(e) {
     // Show error visibly on black screen
