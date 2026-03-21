@@ -15,6 +15,9 @@
 <title>Seed — Built to amplify what is already in you</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Firebase for family sharing -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
 <!-- mammoth.js: read .docx files in browser -->
@@ -932,6 +935,178 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
   text-transform: uppercase; margin-bottom: 4px;
 }
 
+
+/* Family sharing */
+.family-badge {
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(74,106,124,0.2);border:1px solid var(--blue);
+  color:var(--blue);font-size:9px;letter-spacing:0.1em;
+  text-transform:uppercase;padding:2px 7px;
+}
+.family-event {
+  border-left:3px solid var(--blue) !important;
+}
+.family-project {
+  border-left:3px solid var(--blue) !important;
+}
+.shared-indicator {
+  font-size:9px;color:var(--blue);letter-spacing:0.1em;
+  text-transform:uppercase;margin-left:6px;
+}
+.family-members {
+  display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;
+}
+.family-member-chip {
+  background:var(--surface2);border:1px solid var(--border);
+  padding:4px 10px;font-size:10px;color:var(--text-dim);
+  display:flex;align-items:center;gap:6px;
+}
+.family-sync-dot {
+  width:6px;height:6px;border-radius:50%;background:var(--green);
+  animation:pulse 2s infinite;
+}
+.family-sync-dot.offline { background:var(--text-dimmer); animation:none; }
+
+
+/* Install bar - sticky bottom of landing page */
+.install-bar {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border-light);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 100;
+  flex-wrap: wrap;
+}
+.install-bar-text {
+  flex: 1;
+  min-width: 180px;
+}
+.install-bar-title {
+  font-size: 12px;
+  color: var(--text);
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+.install-bar-sub {
+  font-size: 10px;
+  color: var(--text-dimmer);
+  letter-spacing: 0.06em;
+}
+.install-bar-btns {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.ib-btn-android {
+  background: var(--gold);
+  color: var(--bg);
+  border: none;
+  font-family: var(--font-m);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.ib-btn-android:hover { background: var(--gold-bright); }
+.ib-btn-ios {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border-light);
+  font-family: var(--font-m);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.ib-btn-ios:hover { border-color: var(--text-dim); color: var(--text); }
+.ib-dismiss {
+  background: none;
+  border: none;
+  color: var(--text-dimmer);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+/* Install steps drawer */
+.install-steps-drawer {
+  display: none;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 16px 24px;
+}
+.install-steps-drawer.on { display: block; }
+.install-step-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 6px 0;
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+.install-step-num {
+  font-family: var(--font-d);
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--gold-dim);
+  min-width: 20px;
+  flex-shrink: 0;
+}
+/* Already installed state */
+.install-bar.installed {
+  justify-content: center;
+}
+.install-bar.installed .install-bar-title {
+  color: var(--green);
+}
+
+
+/* Account system */
+.acct-modal-wrap {
+  display:flex;flex-direction:column;gap:14px;
+}
+.acct-tab-bar {
+  display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:4px;
+}
+.acct-tab {
+  flex:1;background:none;border:none;border-bottom:2px solid transparent;
+  color:var(--text-dimmer);font-family:var(--font-m);font-size:10px;
+  letter-spacing:0.15em;text-transform:uppercase;padding:10px;cursor:pointer;
+  transition:all 0.15s;
+}
+.acct-tab.active { color:var(--gold);border-bottom-color:var(--gold); }
+.acct-panel { display:none; }
+.acct-panel.on { display:flex;flex-direction:column;gap:10px; }
+.acct-note {
+  background:var(--bg);border:1px solid var(--border);padding:12px 14px;
+  font-size:11px;color:var(--text-dim);line-height:1.8;
+}
+.acct-note strong { color:var(--gold); }
+/* Topbar account indicator */
+.acct-indicator {
+  font-size:9px;letter-spacing:0.1em;text-transform:uppercase;
+  padding:3px 8px;border:1px solid var(--border);color:var(--text-dimmer);
+  cursor:pointer;transition:all 0.15s;background:none;font-family:var(--font-m);
+}
+.acct-indicator:hover { border-color:var(--gold);color:var(--gold); }
+.acct-indicator.signed-in { border-color:var(--green-dim);color:var(--green); }
+
 </style>
 </head>
 <body>
@@ -960,7 +1135,7 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
     <div class="meta-item"><div class="meta-num">0</div><div class="meta-label">External dependencies</div></div>
   </div>
   <div class="hero-cta">
-    <button class="cta-primary" onclick="launchApp(WR_PLATFORM||wrDetectPlatform())" id="heroLaunchBtn">Launch Seed App</button>
+    <button class="cta-primary" onclick="launchApp()" id="heroLaunchBtn">Launch Seed App</button>
     <a href="#timeline" class="cta-ghost">See the build →</a>
   </div>
   <div class="hero-scroll">Scroll to explore</div>
@@ -1124,40 +1299,24 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
 <!-- LAUNCH GATE -->
 <div class="launch-gate" id="launch-gate">
   <h2>Ready to use <em>Seed?</em></h2>
-  <p>The full app suite -- Schedule, Tasks, Calendar, Notes, Journal, Alarms, and Projects -- with the Wild Robot AI that knows your context, runs the full Sovereign Diagnostic pipeline, and hardens itself from every error. All encrypted. All yours.</p>
-  <div class="platform-btns" id="platformBtns">
-    <button class="launch-btn-ios" id="btnIos" onclick="launchApp('ios')">
-      <span class="pbtn-icon">&#63743;</span>
-      <span class="pbtn-label">Launch for iPhone</span>
-      <span class="pbtn-sub">iOS Safari optimized</span>
-    </button>
-    <button class="launch-btn-android" id="btnAndroid" onclick="launchApp('android')">
-      <span class="pbtn-icon">&#9654;</span>
-      <span class="pbtn-label">Launch for Android</span>
-      <span class="pbtn-sub">Chrome optimized</span>
-    </button>
+  <p style="max-width:520px;margin:0 auto 32px;font-size:12px;color:var(--text-dim);line-height:1.9;">
+    Schedule, Tasks, Calendar, Notes, Journal, Alarms, Projects and the Wild Robot AI.
+    All encrypted. All yours. Runs in your browser — no install required.
+  </p>
+  <button onclick="launchApp()" style="
+    background:var(--gold);color:var(--bg);border:none;
+    font-family:var(--font-m);font-size:12px;letter-spacing:0.2em;text-transform:uppercase;
+    padding:18px 48px;cursor:pointer;transition:all 0.2s;
+    display:inline-block;margin-bottom:16px;
+  ">Launch Seed App</button>
+  <div style="font-size:10px;color:var(--text-dimmer);letter-spacing:0.1em;margin-top:8px;">
+    Works on Android and iPhone &mdash; no account needed
   </div>
-  <div style="font-size:10px;color:var(--text-dimmer);margin-top:20px;letter-spacing:0.1em;">Both versions run fully in your browser. No app store. No account.</div>
-  <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;flex-wrap:wrap;">
-    <button onclick="showInstallFromLanding('android')"
-      style="background:transparent;border:1px solid var(--border-light);color:var(--text-dim);font-family:var(--font-m);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:10px 20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;"
-      onmouseover="this.style.borderColor='var(--text-dim)'"
-      onmouseout="this.style.borderColor='var(--border-light)'">
-      &#8681; Download for Android
-    </button>
-    <button onclick="showInstallFromLanding('ios')"
-      style="background:transparent;border:1px solid var(--border-light);color:var(--text-dim);font-family:var(--font-m);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;padding:10px 20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;"
-      onmouseover="this.style.borderColor='var(--text-dim)'"
-      onmouseout="this.style.borderColor='var(--border-light)'">
-      &#9432; Install on iPhone
-    </button>
-  </div>
-  <div style="margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;">
-    <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(74,124,89,0.12);border:1px solid var(--green-dim);color:var(--green);font-family:var(--font-m);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;padding:4px 10px;">
-      <div style="width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;"></div>
-      Powered by R1-v3
-    </div>
-    <div style="font-size:9px;color:var(--text-dimmer);letter-spacing:0.08em;">Sovereign Diagnostic System V3.0</div>
+  <div style="margin-top:20px;display:inline-flex;align-items:center;gap:8px;
+    background:rgba(74,124,89,0.12);border:1px solid var(--green-dim);
+    padding:5px 14px;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);">
+    <div style="width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;"></div>
+    Powered by R1-v3 &mdash; Sovereign Diagnostic V3.0
   </div>
 </div>
 
@@ -1241,30 +1400,61 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
   <div class="footer-copy">Built by Red — Independent — Constitutional — Yours to build on.</div>
 </footer>
 
-<!-- LOCK SCREEN OVERLAY -->
-<div id="lockOverlay" style="display:none;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;">
-  <div style="min-height:var(--app-height);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;">
-    <div style="font-family:var(--font-d);font-size:48px;font-weight:300;letter-spacing:0.4em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Seed</div>
-    <div style="font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-dimmer);margin-bottom:56px;">Your Personal OS</div>
-    <div style="width:100%;max-width:300px;display:flex;flex-direction:column;gap:10px;">
-      <input type="password" id="lockPw" placeholder="Enter your password" autocomplete="current-password"
-        style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font-m);font-size:13px;padding:14px 16px;outline:none;text-align:center;letter-spacing:0.2em;transition:border-color 0.2s;width:100%;">
-      <button onclick="doUnlock()"
-        style="background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:var(--font-m);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;padding:13px;cursor:pointer;transition:all 0.2s;">
-        Unlock
-      </button>
-      <div id="lockErr" style="display:none;font-size:11px;color:var(--red);text-align:center;">Incorrect password. Try again.</div>
-      <div id="lockHint" style="font-size:10px;color:var(--text-dimmer);text-align:center;line-height:1.8;margin-top:4px;">
-        First visit? Set any password above.<br>Your data is encrypted on your device.
-      </div>
-      <button onclick="hideLock()"
-        style="background:transparent;border:none;color:var(--text-dimmer);font-family:var(--font-m);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:8px;cursor:pointer;margin-top:8px;transition:color 0.2s;">
-        ← Back to site
-      </button>
-    </div>
+
+<!-- HOME SCREEN INSTALL BAR - bottom of landing page -->
+<div class="install-bar" id="homeInstallBar">
+  <div class="install-bar-text">
+    <div class="install-bar-title" id="ibTitle">Add Seed to your home screen</div>
+    <div class="install-bar-sub" id="ibSub">Works offline &middot; No app store &middot; Free</div>
   </div>
+  <div class="install-bar-btns" id="ibBtns">
+    <!-- Populated by JS based on platform -->
+  </div>
+  <button class="ib-dismiss" onclick="hideInstallBar()" title="Dismiss">&times;</button>
+</div>
+<div class="install-steps-drawer" id="ibDrawer">
+  <div id="ibDrawerContent"></div>
 </div>
 
+<!-- LOCK SCREEN OVERLAY -->
+<div id="lockOverlay" style="display:none;position:fixed;inset:0;z-index:500;background:var(--bg);overflow-y:auto;">
+  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;">
+
+    <!-- Logo -->
+    <div style="font-family:var(--font-d);font-size:48px;font-weight:300;letter-spacing:0.4em;color:var(--gold);margin-bottom:8px;">Seed</div>
+    <div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:var(--text-dimmer);margin-bottom:48px;">Personal OS</div>
+
+    <!-- Password form -->
+    <div style="width:100%;max-width:340px;">
+      <div style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-dimmer);margin-bottom:10px;">Enter your password</div>
+      <input id="lockPw" type="password" autocomplete="current-password"
+        placeholder="Password"
+        style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);
+               font-family:var(--font-m);font-size:16px;padding:14px 16px;outline:none;
+               margin-bottom:12px;-webkit-appearance:none;border-radius:0;"
+        onkeydown="if(event.key==='Enter')doUnlock()">
+      <button onclick="doUnlock()"
+        style="width:100%;background:var(--gold);color:var(--bg);border:none;
+               font-family:var(--font-m);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;
+               padding:14px;cursor:pointer;transition:background 0.15s;">
+        Enter
+      </button>
+      <div id="lockErr" style="display:none;color:var(--red);font-size:11px;margin-top:10px;text-align:center;">
+        Wrong password
+      </div>
+      <div style="font-size:10px;color:var(--text-dimmer);margin-top:16px;text-align:center;line-height:1.8;">
+        First time? Set any password — it encrypts your data
+      </div>
+    </div>
+
+    <!-- Back to site -->
+    <button onclick="document.getElementById('lockOverlay').style.display='none'"
+      style="background:none;border:none;color:var(--text-dimmer);font-family:var(--font-m);
+             font-size:10px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;
+             margin-top:40px;padding:8px;">
+      ← Back to site
+    </button>
+  </div>
 <!-- APP SHELL OVERLAY -->
 <div id="appOverlay" style="display:none;position:fixed;inset:0;z-index:600;background:var(--bg);flex-direction:column;overflow:hidden;">
 
@@ -1273,6 +1463,13 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
     <div style="font-family:var(--font-d);font-size:17px;font-weight:300;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold);">Seed</div>
     <div style="display:flex;align-items:center;gap:10px;">
       <span id="appClock" style="font-size:11px;color:var(--text-dimmer);letter-spacing:0.08em;"></span>
+      <button id="notifBell" onclick="showNotifCenter()" title="Enable notifications"
+        style="background:none;border:none;color:var(--text-dimmer);cursor:pointer;
+               font-size:16px;padding:4px;transition:color 0.15s;line-height:1;">
+        &#9900;
+      </button>
+      <button class="acct-indicator" id="acctIndicator"
+        onclick="showAccountModal()" title="Account">Guest</button>
       <button id="apiKeyIndicator" onclick="promptApiKey()" title="API Key" style="background:none;border:1px solid var(--border);color:var(--text-dimmer);font-family:var(--font-m);font-size:9px;letter-spacing:0.08em;padding:3px 7px;cursor:pointer;transition:all 0.15s;">NO KEY</button>
       <button onclick="toggleAppSidebar()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:15px;padding:4px;transition:color 0.15s;">☰</button>
       <button onclick="lockAppFn()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:15px;padding:4px;transition:color 0.15s;" title="Lock">⚿</button>
@@ -1299,6 +1496,8 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
         <div class="sni" onclick="showAppView('library')" id="sni-library"><span class="sni-icon">&#128218;</span><span class="sni-label">Library</span></div>
         <div class="sni" onclick="showAppView('researcher')" id="sni-researcher"><span class="sni-icon">&#128269;</span><span class="sni-label">Researcher</span></div>
         <div class="sni" onclick="showAppView('canvas')" id="sni-canvas"><span class="sni-icon">&#9881;</span><span class="sni-label">Canvas</span></div>
+        <div style="font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-dimmer);padding:12px 14px 6px;margin-top:4px;">Family</div>
+        <div class="sni" onclick="showAppView('family')" id="sni-family"><span class="sni-icon">&#128106;</span><span class="sni-label">Family Space</span></div>
         <div style="font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-dimmer);padding:12px 14px 6px;margin-top:4px;">Home</div>
         <div class="sni" onclick="showAppView('files')" id="sni-files"><span class="sni-icon">&#128196;</span><span class="sni-label">Files</span></div>
         <div class="sni" onclick="showAppView('organize')" id="sni-organize"><span class="sni-icon">&#127968;</span><span class="sni-label">Organize</span></div>
@@ -1322,7 +1521,23 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
 
       <!-- HOME -->
       <div class="appview active" id="av-home">
-        <div class="avhead"><div class="avtitle">Good <em id="appGreet">morning</em></div><div class="avacts"><button class="avbtn" onclick="renderAppDash()">↺</button></div></div>
+        <div class="avhead">
+          <div class="avtitle">Good <em id="appGreet">morning</em></div>
+          <div class="avacts">
+            <button class="avbtn" onclick="renderAppDash()">&#8635;</button>
+          </div>
+        </div>
+        <!-- Features access bar -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;padding:10px 18px 0;border-bottom:1px solid var(--border);background:var(--bg);">
+          <button onclick="showAppView('tasks')" class="avbtn">Tasks</button>
+          <button onclick="showAppView('calendar')" class="avbtn">Calendar</button>
+          <button onclick="showAppView('notes')" class="avbtn">Notes</button>
+          <button onclick="showAppView('journal')" class="avbtn">Journal</button>
+          <button onclick="showAppView('projects')" class="avbtn">Projects</button>
+          <button onclick="showAppView('files')" class="avbtn">Files</button>
+          <button onclick="showAppView('groceries')" class="avbtn" style="color:var(--green);">Groceries</button>
+          <button onclick="toggleAppSidebar()" class="avbtn primary" style="margin-left:auto;">&#9776; All</button>
+        </div>
         <div class="avbody"><div id="appDashGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;"></div></div>
       </div>
 
@@ -1765,6 +1980,67 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
         </div>
       </div>
 
+
+      <!-- FAMILY VIEW -->
+      <div class="appview" id="av-family">
+        <div class="avhead">
+          <div class="avtitle"><em>Family</em> Space</div>
+          <div class="avacts">
+            <button class="avbtn primary" onclick="openFamilyModal()">+ Setup</button>
+          </div>
+        </div>
+        <div class="avbody">
+
+          <!-- Status bar -->
+          <div style="background:var(--bg);border:1px solid var(--border);padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+            <div>
+              <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-dimmer);margin-bottom:4px;">Family Code</div>
+              <div id="familyCodeDisplay" style="font-family:var(--font-d);font-size:28px;font-weight:300;letter-spacing:0.3em;color:var(--gold);">------</div>
+            </div>
+            <div style="text-align:right;">
+              <div id="familyIndicator" style="font-size:10px;color:var(--text-dimmer);letter-spacing:0.08em;margin-bottom:6px;">No family space</div>
+              <button onclick="openFamilyModal()" class="avbtn">Manage</button>
+            </div>
+          </div>
+
+          <!-- Members -->
+          <div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-dimmer);margin-bottom:8px;">Members Online</div>
+          <div id="familyMembersList" class="family-members" style="margin-bottom:18px;">
+            <div style="font-size:10px;color:var(--text-dimmer);">Join or create a family space to see members.</div>
+          </div>
+
+          <!-- Shared events -->
+          <div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-dimmer);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
+            <span>Shared Calendar Events</span>
+            <span style="color:var(--blue);font-size:9px;" id="famEvCount">0</span>
+          </div>
+          <div id="familyEventsList" style="display:flex;flex-direction:column;gap:2px;margin-bottom:18px;">
+            <div style="font-size:10px;color:var(--text-dimmer);">No shared events yet. Open Calendar, add an event, then tap Share.</div>
+          </div>
+
+          <!-- Shared projects -->
+          <div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-dimmer);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
+            <span>Shared Projects</span>
+            <span style="color:var(--blue);font-size:9px;" id="famProjCount">0</span>
+          </div>
+          <div id="familyProjectsList" style="display:flex;flex-direction:column;gap:2px;">
+            <div style="font-size:10px;color:var(--text-dimmer);">No shared projects yet. Open Projects, tap a project, then tap Share.</div>
+          </div>
+
+          <!-- How it works -->
+          <div style="margin-top:24px;border-top:1px solid var(--border);padding-top:16px;">
+            <div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-dimmer);margin-bottom:10px;">How It Works</div>
+            <div style="font-size:11px;color:var(--text-dimmer);line-height:2;">
+              1. Create a Family Space to get your 6-letter code<br>
+              2. Share the code with family members<br>
+              3. They enter the code on their device to join<br>
+              4. Mark calendar events or projects as shared<br>
+              5. Changes sync in real time across all devices
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /views container -->
   </div><!-- /app body -->
 
@@ -2007,21 +2283,15 @@ function showInstallBanner() {
   if (p === 'android' && INSTALL_PROMPT_EVENT) {
     btns.innerHTML = '<button class="install-btn-primary" onclick="triggerAndroidInstall()">&#8681; Add to Home Screen</button>';
     banner.classList.add('on');
-  document.body.style.paddingBottom = '140px';
-  // Auto-dismiss after 10s
-  setTimeout(function() { if (document.getElementById('installBanner').classList.contains('on')) dismissInstall(); }, 10000);
+  // Banner suppressed
   } else if (p === 'ios') {
     btns.innerHTML = '<button class="install-btn-primary" onclick="showIosSteps()">&#9432; How to Install on iPhone</button>';
     banner.classList.add('on');
-  document.body.style.paddingBottom = '140px';
-  // Auto-dismiss after 10s
-  setTimeout(function() { if (document.getElementById('installBanner').classList.contains('on')) dismissInstall(); }, 10000);
+  // Banner suppressed
   } else if (INSTALL_PROMPT_EVENT) {
     btns.innerHTML = '<button class="install-btn-primary" onclick="triggerAndroidInstall()">&#8681; Install Seed App</button>';
     banner.classList.add('on');
-  document.body.style.paddingBottom = '140px';
-  // Auto-dismiss after 10s
-  setTimeout(function() { if (document.getElementById('installBanner').classList.contains('on')) dismissInstall(); }, 10000);
+  // Banner suppressed
   }
 }
 
@@ -2049,7 +2319,7 @@ function dismissInstall() {
   if (banner) banner.classList.remove('on');
   document.body.style.paddingBottom = '0';
   INSTALL_DISMISSED = true;
-  localStorage.setItem('seed_install_dismissed', '1');
+  try { localStorage.setItem('seed_install_dismissed', '1'); } catch(e) {}
 }
 
 function showInstallFromLanding(platform) {
@@ -2068,9 +2338,7 @@ function showInstallFromLanding(platform) {
       : '<button class="install-btn-primary" onclick="showAndroidManual()">&#9432; How to Install on Android</button>';
   }
   banner.classList.add('on');
-  document.body.style.paddingBottom = '140px';
-  // Auto-dismiss after 10s
-  setTimeout(function() { if (document.getElementById('installBanner').classList.contains('on')) dismissInstall(); }, 10000);
+  // Banner suppressed
   if (banner.scrollIntoView) banner.scrollIntoView({behavior:'smooth', block:'end'});
 }
 
@@ -2099,29 +2367,31 @@ document.querySelectorAll('.reveal, .titem').forEach(function(el) {
 
 // -- LAUNCH APP ----------------------------------------------
 function launchApp(platform) {
-  // Use detected platform if not specified
-  var p = platform || WR_PLATFORM || wrDetectPlatform();
-  WR_PLATFORM = p;
-  wrApplyPlatform(p);
-
-  // Highlight active button
-  document.querySelectorAll('.launch-btn-ios, .launch-btn-android').forEach(function(b) {
-    b.classList.remove('active');
-  });
-  if (p === 'ios') {
-    var b = document.getElementById('btnIos');
-    if (b) b.classList.add('active');
-  } else {
-    var b2 = document.getElementById('btnAndroid');
-    if (b2) b2.classList.add('active');
-  }
-
+  // Hide install banner if showing
+  dismissInstall();
+  // Show lock screen immediately
   var overlay = document.getElementById('lockOverlay');
-  overlay.style.cssText = 'display:block;position:fixed;top:0;left:0;right:0;bottom:0;z-index:500;background:var(--bg);overflow-y:auto;';
+  if (overlay) {
+    overlay.style.display = 'block';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.right = '0';
+    overlay.style.bottom = '0';
+    overlay.style.zIndex = '500';
+    overlay.style.background = 'var(--bg)';
+    overlay.style.overflowY = 'auto';
+  }
   setTimeout(function() {
     var pw = document.getElementById('lockPw');
     if (pw) { pw.focus(); }
-  }, 250);
+  }, 150);
+  // Apply platform optimizations in background (non-blocking)
+  try {
+    var p = platform || (typeof wrDetectPlatform === 'function' ? wrDetectPlatform() : 'android');
+    WR_PLATFORM = p;
+    if (typeof wrApplyPlatform === 'function') wrApplyPlatform(p);
+  } catch(e) { /* non-critical */ }
 }
 function hideLock() {
   document.getElementById('lockOverlay').style.display = 'none';
@@ -2156,7 +2426,7 @@ async function loadAD() {
 }
 
 // -- UNLOCK ---------------------------------------------------
-async function doUnlock() {
+async async function doUnlock() {
   const pw = document.getElementById('lockPw').value;
   if (!pw) return;
   CK = await deriveKey(pw);
@@ -2196,11 +2466,25 @@ function initApp() {
   initAiMode();
   initExtensions();
   initExpandableMessages();
+  initNotifications();
+  initAccount();
+  initFamilySharing();
   initGroceries();
   // Show API key prompt if not set
   if (!hasApiKey()) {
     setTimeout(function() {
       showAppToast('Add your Anthropic API key to use Seed AI');
+    // Gentle account note after 4 seconds
+    if (!ACCT_USER && !localStorage.getItem('acct_noted')) {
+      setTimeout(function() {
+        localStorage.setItem('acct_noted', '1');
+        var ind = document.getElementById('acctIndicator');
+        if (ind) {
+          ind.style.borderColor = 'var(--gold)';
+          ind.title = 'Create a free account to save your data across devices';
+        }
+      }, 4000);
+    }
       var keyBtn = document.getElementById('sni-apikey');
       if (keyBtn) { keyBtn.style.borderLeft = '2px solid var(--gold)'; keyBtn.style.color = 'var(--gold)'; }
     }, 1200);
@@ -2278,7 +2562,7 @@ function toggleAppTask(i) { AD.tasks[i].done=!AD.tasks[i].done; saveAD(); render
 function addAppTask(title,dueDate,priority,category) {
   AD.tasks.push({id:Date.now(),title,dueDate:dueDate||'',priority:priority||'',category:category||'',done:false,created:new Date().toISOString()});
   if (dueDate) AD.events.push({id:Date.now()+1,title:'[ok] '+title,date:dueDate,type:'task',time:'',notes:''});
-  saveAD(); renderAppTasks(); renderAppCal(); renderAppDash();
+  saveAD(); onDataChange(); renderAppTasks(); renderAppCal(); renderAppDash();
 }
 function delAppItem(type,i) { AD[type].splice(i,1); saveAD(); renderAppDash(); renderAppTasks(); renderAppAlarms(); renderAppProjects(); }
 
@@ -2302,7 +2586,7 @@ function renderAppCal() {
   cells.forEach(c=>{
     const isTod=c.cur&&c.day===today.getDate()&&calM===today.getMonth()&&calY===today.getFullYear();
     const ds=`${calY}-${String(calM+1).padStart(2,'0')}-${String(c.day).padStart(2,'0')}`;
-    const evs=AD.events.filter(e=>e.date===ds);
+    const evs=[...AD.events,...(FAMILY_EVENTS||[])].filter(e=>e.date===ds);
     html+=`<div style="background:${isTod?'var(--surface)':'var(--bg)'};padding:5px;min-height:56px;cursor:pointer;" onclick="openAppModal('event',{date:'${ds}'})">
       <div style="font-size:10px;color:${isTod?'var(--gold)':c.cur?'var(--text-dim)':'var(--text-dimmer)'};margin-bottom:2px;">${c.day}</div>
       ${evs.slice(0,2).map(e=>`<div style="font-size:8px;padding:1px 3px;margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:${e.type==='task'?'var(--green-dim)':'var(--gold-dim)'};color:${e.type==='task'?'var(--green)':'var(--gold)'};">${e.title}</div>`).join('')}
@@ -2313,7 +2597,7 @@ function renderAppCal() {
 function appCalNav(d) { calM+=d; if(calM>11){calM=0;calY++;} if(calM<0){calM=11;calY--;} renderAppCal(); }
 function addAppEvent(title,date,time,notes,type) {
   AD.events.push({id:Date.now(),title,date,time:time||'',notes:notes||'',type:type||'event'});
-  saveAD(); renderAppCal(); renderAppDash();
+  saveAD(); onDataChange(); renderAppCal(); renderAppDash();
 }
 function showFamilyCode() {
   if (!AD.settings.familyCode) AD.settings.familyCode=Math.random().toString(36).substring(2,8).toUpperCase();
@@ -2437,15 +2721,18 @@ function renderAppAlarms() {
 function toggleAppAlarm(i) { AD.alarms[i].enabled=!AD.alarms[i].enabled; saveAD(); renderAppAlarms(); }
 function addAppAlarm(time,label,repeat) {
   AD.alarms.push({id:Date.now(),time,label:label||'Alarm',repeat:repeat||'Once',enabled:true});
-  saveAD(); renderAppAlarms(); renderAppDash();
+  saveAD(); onDataChange(); renderAppAlarms(); renderAppDash();
 }
 function checkAppAlarms() {
   const ct=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}).substring(0,5);
   AD.alarms.forEach((a,i)=>{
     if (a.enabled&&a.time===ct) {
+      // In-app alarm ring
       document.getElementById('appAlarmTime').textContent=a.time;
       document.getElementById('appAlarmLabel').textContent=a.label;
       document.getElementById('appAlarmRing').style.display='flex';
+      // System notification (works even if app is in background tab)
+      showLocalNotif(a.label||'Alarm', 'Time: '+a.time, 'alarm-'+a.id);
       if (a.repeat==='Once') { AD.alarms[i].enabled=false; saveAD(); renderAppAlarms(); }
     }
   });
@@ -2465,6 +2752,10 @@ function renderAppProjects() {
       <div style="display:flex;gap:6px;">
         <button class="avbtn" onclick="updateAppProj(${i})">Update %</button>
         <button class="avbtn" onclick="delAppItem('projects',${i})">Delete</button>
+      <button class="avbtn" style="border-color:${p.family?'var(--green)':'var(--border)'};color:${p.family?'var(--green)':'var(--text-dimmer)'}"
+        onclick="${p.family?'unshareProject':'shareProjectWithFamily'}(${p.id})">
+        ${p.family?'&#10003; Shared':'Share'}
+      </button>
       </div>
     </div>`).join('');
 }
@@ -3973,6 +4264,93 @@ function getExtendedModalTemplate(type, data) {
       '<div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dimmer);margin-bottom:6px;">Knowledge Nodes (' + (data.knowledge||[]).length + ')</div>' +
       '<div style="max-height:160px;overflow-y:auto;">' + (data.knowledge||[]).slice(0,10).map(function(k){return '<div style="font-size:10px;color:var(--text-dim);padding:4px 0;border-bottom:1px solid var(--border);">[' + k.confidence + '] ' + k.node + '</div>';}).join('') + '</div>' +
       '<div class="macts"><button class="mcanc" onclick="closeAppModal()">Close</button><button class="msave" onclick="closeAppModal();sendToCanvas(0)">Send to Canvas</button></div>';
+  }
+  if (type === 'notifcenter') {
+    var permState = ('Notification' in window) ? Notification.permission : 'unsupported';
+    var permColor = permState === 'granted' ? 'var(--green)' : permState === 'denied' ? 'var(--red)' : 'var(--gold)';
+    var permLabel = permState === 'granted' ? 'ON - receiving notifications' : permState === 'denied' ? 'BLOCKED - enable in browser settings' : 'Not yet enabled';
+    return '<div style="font-family:var(--font-d);font-size:22px;font-weight:300;margin-bottom:18px;">Notifications</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding:12px 14px;background:var(--bg);border:1px solid var(--border);">' +
+        '<div style="width:8px;height:8px;border-radius:50%;background:' + permColor + ';"></div>' +
+        '<div style="font-size:11px;color:var(--text-dim);">' + permLabel + '</div>' +
+      '</div>' +
+      '<div style="font-size:10px;color:var(--text-dimmer);line-height:1.9;margin-bottom:16px;">' +
+        'Seed can notify you for:<br>' +
+        '&#9900; Alarms at their set time<br>' +
+        '&#9900; Task reminders 1 day before due date<br>' +
+        '&#9900; Event reminders 30 minutes before<br>' +
+        '&#9900; Journal prompts (daily)<br>' +
+        '&#9900; Even when the app tab is in the background' +
+      '</div>' +
+      (permState !== 'granted' ? '<div class="macts"><button class="mcanc" onclick="closeAppModal()">Cancel</button><button class="msave" onclick="closeAppModal();requestNotifPermission()">Enable Notifications</button></div>' :
+        '<div style="font-size:10px;color:var(--text-dimmer);margin-bottom:12px;">Notifications are active. Alarms will ring even with the app in the background.</div>' +
+        '<div class="macts"><button class="mcanc" onclick="closeAppModal()">Close</button><button class="msave" onclick="closeAppModal();scheduleUpcomingReminders();showAppToast('Reminders synced')">Sync Reminders</button></div>');
+  }
+
+  if (type === 'family') {
+    var code = FAMILY_CODE || '';
+    if (code) {
+      // Already in a family - show management
+      return '<div style="font-family:var(--font-d);font-size:22px;font-weight:300;margin-bottom:18px;">Family <em style="color:var(--gold)">Space</em></div>' +
+        '<div style="background:var(--bg);border:1px solid var(--border);padding:16px;text-align:center;margin-bottom:16px;">' +
+          '<div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-dimmer);margin-bottom:6px;">Your Family Code</div>' +
+          '<div style="font-family:var(--font-d);font-size:36px;font-weight:300;letter-spacing:0.4em;color:var(--gold);">' + code + '</div>' +
+          '<div style="font-size:10px;color:var(--text-dimmer);margin-top:6px;">Share this code with family members</div>' +
+        '</div>' +
+        '<div id="familyMembersModal" class="family-members" style="margin-bottom:16px;"></div>' +
+        '<div class="macts">' +
+          '<button class="mcanc" onclick="submitFamilyModal('leave')">Leave Space</button>' +
+          '<button class="msave" onclick="closeAppModal()">Done</button>' +
+        '</div>';
+    }
+    return '<div style="font-family:var(--font-d);font-size:22px;font-weight:300;margin-bottom:18px;">Family <em style="color:var(--gold)">Space</em></div>' +
+      '<div style="font-size:11px;color:var(--text-dim);line-height:1.9;margin-bottom:18px;">Share your calendar and projects with family. Real-time sync across all devices. Free.</div>' +
+      '<div style="margin-bottom:16px;background:var(--bg);border:1px solid var(--border);padding:16px;">' +
+        '<div style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dimmer);margin-bottom:10px;">Create New Family Space</div>' +
+        '<div class="mfg"><label class="mflbl">Your name</label><input class="mfi" id="fam-name" placeholder="e.g. Mom, Dad, Red..."></div>' +
+        '<button class="msave" style="width:100%;margin-top:8px;" onclick="submitFamilyModal('create')">Create Space</button>' +
+      '</div>' +
+      '<div style="text-align:center;font-size:10px;color:var(--text-dimmer);margin:12px 0;">-- or --</div>' +
+      '<div style="background:var(--bg);border:1px solid var(--border);padding:16px;">' +
+        '<div style="font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-dimmer);margin-bottom:10px;">Join Existing Space</div>' +
+        '<div class="mfg"><label class="mflbl">Family code (6 letters)</label><input class="mfi" id="fam-code" placeholder="e.g. SEED42" maxlength="6" style="letter-spacing:0.3em;text-transform:uppercase;"></div>' +
+        '<div class="mfg"><label class="mflbl">Your name</label><input class="mfi" id="fam-name2" placeholder="e.g. Mom, Dad, Red..."></div>' +
+        '<button class="msave" style="width:100%;margin-top:8px;" onclick="submitFamilyModal('join')">Join Space</button>' +
+      '</div>' +
+      '<div class="macts" style="margin-top:8px;"><button class="mcanc" onclick="closeAppModal()">Cancel</button></div>';
+  }
+
+  if (type === 'account') {
+    var isIn = !!ACCT_USER;
+    if (isIn) {
+      return '<div style="font-family:var(--font-d);font-size:22px;font-weight:300;margin-bottom:18px;">Your <em style="font-style:italic;color:var(--gold);">Account</em></div>' +
+        '<div class="acct-note"><strong>' + ACCT_USER.username + '</strong><br>' + ACCT_USER.email + '</div>' +
+        '<div style="font-size:10px;color:var(--text-dimmer);line-height:1.8;margin-top:8px;margin-bottom:16px;">Your data is saved locally on this device. All features are available.</div>' +
+        '<div class="macts"><button class="mcanc" onclick="acctSignOut()">Sign Out</button><button class="msave" onclick="closeAppModal()">Close</button></div>';
+    }
+    return '<div style="font-family:var(--font-d);font-size:22px;font-weight:300;margin-bottom:18px;">Account <em style="font-style:italic;color:var(--gold);">Optional</em></div>' +
+      '<div class="acct-note" style="margin-bottom:16px;">' +
+        '<strong>All features work without signing in.</strong><br>' +
+        'Create an account if you want to save your data across devices or keep your username. No real name needed.' +
+      '</div>' +
+      '<div class="acct-tab-bar">' +
+        '<button class="acct-tab active" data-tab="signup" onclick="switchAcctTab('signup')">Create Account</button>' +
+        '<button class="acct-tab" data-tab="signin" onclick="switchAcctTab('signin')">Sign In</button>' +
+      '</div>' +
+      '<div id="acctError" style="display:none;color:var(--red);font-size:11px;margin-bottom:4px;"></div>' +
+      '<div id="acctStatus" style="font-size:10px;color:var(--text-dimmer);margin-bottom:4px;"></div>' +
+      '<div class="acct-panel on" id="acctPanel-signup">' +
+        '<div class="mfg"><label class="mflbl">Username</label><input class="mfi" id="acctUsername" placeholder="how others will see you" autocomplete="username"></div>' +
+        '<div class="mfg"><label class="mflbl">Email</label><input class="mfi" id="acctEmail" type="email" placeholder="your@email.com" autocomplete="email"></div>' +
+        '<div class="mfg"><label class="mflbl">Password</label><input class="mfi" id="acctPassword" type="password" placeholder="at least 8 characters" autocomplete="new-password"></div>' +
+        '<div style="font-size:9px;color:var(--text-dimmer);line-height:1.7;margin-bottom:4px;">Your encryption password is separate from your account password. Both protect your data differently.</div>' +
+        '<div class="macts"><button class="mcanc" onclick="closeAppModal()">Maybe Later</button><button class="msave" onclick="acctSignUp()">Create Account</button></div>' +
+      '</div>' +
+      '<div class="acct-panel" id="acctPanel-signin">' +
+        '<div class="mfg"><label class="mflbl">Email</label><input class="mfi" id="acctEmailIn" type="email" placeholder="your@email.com" autocomplete="email"></div>' +
+        '<div class="mfg"><label class="mflbl">Password</label><input class="mfi" id="acctPasswordIn" type="password" placeholder="your password" autocomplete="current-password"></div>' +
+        '<div class="macts"><button class="mcanc" onclick="closeAppModal()">Cancel</button><button class="msave" onclick="acctSignIn()">Sign In</button></div>' +
+      '</div>';
   }
   return '';
 }
@@ -6131,6 +6509,915 @@ function removeGroceryItem(id) {
   renderGroceryList();
 }
 
+
+// ============================================================
+// NOTIFICATION SYSTEM
+// Permission, scheduling, SW sync
+// ============================================================
+
+var NOTIF_GRANTED = false;
+
+// Request notification permission
+async function requestNotifPermission() {
+  if (!('Notification' in window)) {
+    showAppToast('Notifications not supported in this browser');
+    return false;
+  }
+  if (Notification.permission === 'granted') {
+    NOTIF_GRANTED = true;
+    return true;
+  }
+  if (Notification.permission === 'denied') {
+    showAppToast('Notifications blocked - enable in browser settings');
+    return false;
+  }
+  var perm = await Notification.requestPermission();
+  NOTIF_GRANTED = perm === 'granted';
+  if (NOTIF_GRANTED) {
+    showAppToast('Notifications enabled');
+    syncAlarmsToSW();
+    registerPeriodicSync();
+  } else {
+    showAppToast('Notification permission denied');
+  }
+  return NOTIF_GRANTED;
+}
+
+// Show a local notification (when app is open)
+function showLocalNotif(title, body, tag) {
+  if (Notification.permission !== 'granted') return;
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.ready.then(function(reg) {
+      reg.showNotification(title, {
+        body: body || '',
+        tag: tag || 'seed',
+        icon: '/icon-192.svg',
+        badge: '/icon-192.svg',
+        vibrate: [200, 100, 200],
+        requireInteraction: false,
+        actions: [
+          { action: 'open', title: 'Open' },
+          { action: 'dismiss', title: 'Dismiss' }
+        ]
+      });
+    });
+  } else {
+    new Notification(title, { body: body || '', tag: tag || 'seed' });
+  }
+}
+
+// Sync alarms to SW IDB so SW can fire them even when page closed
+function syncAlarmsToSW() {
+  if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) return;
+  navigator.serviceWorker.controller.postMessage({
+    type: 'sync-alarms',
+    alarms: AD.alarms || []
+  });
+}
+
+// Sync a reminder to SW
+function addSWReminder(id, title, body, fireAt) {
+  if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) return;
+  navigator.serviceWorker.controller.postMessage({
+    type: 'add-reminder',
+    reminder: { id: id, title: title, body: body, fireAt: fireAt, fired: false }
+  });
+}
+
+// Register periodic background sync (keeps SW checking alarms)
+async function registerPeriodicSync() {
+  if (!('serviceWorker' in navigator)) return;
+  try {
+    var reg = await navigator.serviceWorker.ready;
+    if ('periodicSync' in reg) {
+      await reg.periodicSync.register('seed-alarm-check', { minInterval: 60 * 1000 });
+      console.log('Periodic sync registered');
+    }
+  } catch(e) {
+    console.log('Periodic sync not available:', e.message);
+  }
+}
+
+// Check notification permission state on load
+function initNotifications() {
+  if (!('Notification' in window)) return;
+  NOTIF_GRANTED = Notification.permission === 'granted';
+  updateNotifBadge();
+  if (NOTIF_GRANTED) {
+    syncAlarmsToSW();
+    registerPeriodicSync();
+    scheduleUpcomingReminders();
+  }
+}
+
+// Update the notification bell badge in topbar
+function updateNotifBadge() {
+  var bell = document.getElementById('notifBell');
+  if (!bell) return;
+  if (Notification.permission === 'granted') {
+    bell.style.color = 'var(--green)';
+    bell.title = 'Notifications ON';
+  } else if (Notification.permission === 'denied') {
+    bell.style.color = 'var(--red)';
+    bell.title = 'Notifications blocked';
+  } else {
+    bell.style.color = 'var(--text-dimmer)';
+    bell.title = 'Enable notifications';
+  }
+}
+
+// Schedule reminders for upcoming tasks and events
+function scheduleUpcomingReminders() {
+  if (!NOTIF_GRANTED) return;
+  var now = Date.now();
+  var oneDayMs = 24 * 60 * 60 * 1000;
+
+  // Task due date reminders - fire 1 day before due at 9am
+  (AD.tasks || []).forEach(function(task) {
+    if (task.done || !task.dueDate) return;
+    var due = new Date(task.dueDate + 'T09:00:00');
+    var fireAt = due.getTime() - oneDayMs;
+    if (fireAt > now) {
+      addSWReminder(
+        'task-remind-' + task.id,
+        'Task due tomorrow: ' + task.title,
+        'Due: ' + task.dueDate,
+        fireAt
+      );
+    }
+    // Also fire at 9am on the due date itself
+    if (due.getTime() > now) {
+      addSWReminder(
+        'task-due-' + task.id,
+        'Task due today: ' + task.title,
+        'Complete: ' + task.title,
+        due.getTime()
+      );
+    }
+  });
+
+  // Event reminders - fire 30 min before
+  (AD.events || []).forEach(function(ev) {
+    if (!ev.date || !ev.time) return;
+    var evTime = new Date(ev.date + 'T' + ev.time + ':00');
+    var fireAt = evTime.getTime() - (30 * 60 * 1000);
+    if (fireAt > now) {
+      addSWReminder(
+        'event-remind-' + ev.id,
+        ev.title + ' in 30 minutes',
+        ev.date + ' at ' + ev.time,
+        fireAt
+      );
+    }
+  });
+
+  // Alarm sync - send all alarms to SW
+  syncAlarmsToSW();
+}
+
+// Called every time alarms/tasks/events change
+function onDataChange() {
+  if (NOTIF_GRANTED) {
+    syncAlarmsToSW();
+    scheduleUpcomingReminders();
+  }
+}
+
+// Show notification center modal
+function showNotifCenter() {
+  if (Notification.permission !== 'granted') {
+    requestNotifPermission();
+    return;
+  }
+  openAppModal('notifcenter');
+}
+
+
+
+// ============================================================
+// FAMILY SHARING SYSTEM
+// Uses Firebase Realtime DB (free tier) for real-time sync
+// Family members share a 6-char code -> /seed-families/{code}/
+// Shared: calendar events tagged family=true, shared projects
+// ============================================================
+
+// Firebase config - shared public project for Seed family spaces
+// This is a public read/write DB - data is scoped by family code
+// Each family code is effectively a shared secret namespace
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyB_placeholder_seed_family",
+  authDomain: "seed-family-spaces.firebaseapp.com",
+  databaseURL: "https://seed-family-spaces-default-rtdb.firebaseio.com",
+  projectId: "seed-family-spaces"
+};
+
+var FB_APP = null;
+var FB_DB = null;
+var FAMILY_CODE = null;
+var FAMILY_LISTENERS = {};
+var FAMILY_ONLINE = false;
+var FAMILY_NAME = '';
+
+// -- FIREBASE INIT ---------------------------------------------
+function initFirebase() {
+  try {
+    if (typeof firebase === 'undefined') {
+      console.log('Firebase not loaded');
+      return false;
+    }
+    if (!FB_APP) {
+      FB_APP = firebase.initializeApp(FIREBASE_CONFIG);
+    }
+    FB_DB = firebase.database();
+    return true;
+  } catch(e) {
+    console.log('Firebase init error:', e.message);
+    return false;
+  }
+}
+
+// -- FAMILY CODE GENERATION ------------------------------------
+function generateFamilyCode() {
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var code = '';
+  for (var i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
+// -- CREATE FAMILY SPACE ---------------------------------------
+async function createFamilySpace(memberName) {
+  if (!initFirebase()) {
+    showAppToast('Family sharing requires internet connection');
+    return false;
+  }
+  var code = generateFamilyCode();
+  var ref = FB_DB.ref('seed-families/' + code);
+  try {
+    // Check code not already taken
+    var snap = await ref.once('value');
+    if (snap.exists()) {
+      // Try again
+      return createFamilySpace(memberName);
+    }
+    // Create family space
+    await ref.set({
+      created: Date.now(),
+      members: {},
+      events: {},
+      projects: {}
+    });
+    // Add this member
+    var memberId = 'member_' + Date.now();
+    await ref.child('members/' + memberId).set({
+      name: memberName || 'Member 1',
+      joinedAt: Date.now(),
+      lastSeen: Date.now()
+    });
+    // Store locally
+    FAMILY_CODE = code;
+    FAMILY_NAME = memberName || 'Me';
+    AD.settings.familyCode = code;
+    AD.settings.familyMemberId = memberId;
+    AD.settings.familyName = memberName || 'Me';
+    saveAD();
+    // Start listening
+    startFamilyListeners();
+    updateFamilyUI();
+    showAppToast('Family space created: ' + code);
+    return code;
+  } catch(e) {
+    showAppToast('Error: ' + e.message);
+    return false;
+  }
+}
+
+// -- JOIN FAMILY SPACE -----------------------------------------
+async function joinFamilySpace(code, memberName) {
+  code = (code || '').toUpperCase().trim();
+  if (code.length !== 6) {
+    showAppToast('Enter your 6-letter family code');
+    return false;
+  }
+  if (!initFirebase()) {
+    showAppToast('Family sharing requires internet connection');
+    return false;
+  }
+  var ref = FB_DB.ref('seed-families/' + code);
+  try {
+    var snap = await ref.once('value');
+    if (!snap.exists()) {
+      showAppToast('Family code not found: ' + code);
+      return false;
+    }
+    // Join as new member
+    var memberId = 'member_' + Date.now();
+    await ref.child('members/' + memberId).set({
+      name: memberName || 'New Member',
+      joinedAt: Date.now(),
+      lastSeen: Date.now()
+    });
+    FAMILY_CODE = code;
+    FAMILY_NAME = memberName || 'New Member';
+    AD.settings.familyCode = code;
+    AD.settings.familyMemberId = memberId;
+    AD.settings.familyName = memberName || 'New Member';
+    saveAD();
+    startFamilyListeners();
+    updateFamilyUI();
+    showAppToast('Joined family space: ' + code);
+    return true;
+  } catch(e) {
+    showAppToast('Error joining: ' + e.message);
+    return false;
+  }
+}
+
+// -- LEAVE FAMILY SPACE ----------------------------------------
+function leaveFamilySpace() {
+  stopFamilyListeners();
+  FAMILY_CODE = null;
+  AD.settings.familyCode = null;
+  AD.settings.familyMemberId = null;
+  AD.settings.familyName = null;
+  saveAD();
+  updateFamilyUI();
+  showAppToast('Left family space');
+}
+
+// -- REAL-TIME LISTENERS ---------------------------------------
+function startFamilyListeners() {
+  if (!FB_DB || !FAMILY_CODE) return;
+  stopFamilyListeners();
+
+  var base = 'seed-families/' + FAMILY_CODE;
+
+  // Listen to shared events
+  FAMILY_LISTENERS.events = FB_DB.ref(base + '/events').on('value', function(snap) {
+    var remoteEvents = [];
+    snap.forEach(function(child) {
+      remoteEvents.push(child.val());
+    });
+    mergeFamilyEvents(remoteEvents);
+  });
+
+  // Listen to shared projects
+  FAMILY_LISTENERS.projects = FB_DB.ref(base + '/projects').on('value', function(snap) {
+    var remoteProjects = [];
+    snap.forEach(function(child) {
+      remoteProjects.push(child.val());
+    });
+    mergeFamilyProjects(remoteProjects);
+  });
+
+  // Listen to members (presence)
+  FAMILY_LISTENERS.members = FB_DB.ref(base + '/members').on('value', function(snap) {
+    var members = [];
+    snap.forEach(function(child) {
+      members.push(child.val());
+    });
+    renderFamilyMembers(members);
+  });
+
+  // Update own presence
+  updatePresence();
+  FAMILY_ONLINE = true;
+  updateFamilyUI();
+}
+
+function stopFamilyListeners() {
+  if (!FB_DB || !FAMILY_CODE) return;
+  var base = 'seed-families/' + FAMILY_CODE;
+  if (FAMILY_LISTENERS.events) FB_DB.ref(base + '/events').off('value', FAMILY_LISTENERS.events);
+  if (FAMILY_LISTENERS.projects) FB_DB.ref(base + '/projects').off('value', FAMILY_LISTENERS.projects);
+  if (FAMILY_LISTENERS.members) FB_DB.ref(base + '/members').off('value', FAMILY_LISTENERS.members);
+  FAMILY_LISTENERS = {};
+  FAMILY_ONLINE = false;
+}
+
+function updatePresence() {
+  if (!FB_DB || !FAMILY_CODE || !AD.settings.familyMemberId) return;
+  var ref = FB_DB.ref('seed-families/' + FAMILY_CODE + '/members/' + AD.settings.familyMemberId);
+  ref.update({ lastSeen: Date.now(), name: AD.settings.familyName || FAMILY_NAME });
+}
+
+// -- SYNC EVENTS TO FAMILY -------------------------------------
+function shareEventWithFamily(eventId) {
+  if (!FB_DB || !FAMILY_CODE) {
+    showAppToast('Join a family space first');
+    return;
+  }
+  var ev = (AD.events || []).find(function(e) { return e.id === eventId; });
+  if (!ev) return;
+
+  var sharedEv = Object.assign({}, ev, {
+    sharedBy: AD.settings.familyName || 'Family',
+    sharedByMember: AD.settings.familyMemberId,
+    sharedAt: Date.now(),
+    family: true
+  });
+
+  FB_DB.ref('seed-families/' + FAMILY_CODE + '/events/' + eventId).set(sharedEv)
+    .then(function() { showAppToast('Event shared with family'); })
+    .catch(function(e) { showAppToast('Share failed: ' + e.message); });
+}
+
+function unshareEvent(eventId) {
+  if (!FB_DB || !FAMILY_CODE) return;
+  FB_DB.ref('seed-families/' + FAMILY_CODE + '/events/' + eventId).remove()
+    .then(function() { showAppToast('Event unshared'); });
+}
+
+// Merge remote family events into local view (not into AD.events directly)
+var FAMILY_EVENTS = [];
+function mergeFamilyEvents(remoteEvents) {
+  FAMILY_EVENTS = remoteEvents;
+  // Re-render calendar to show family events
+  if (document.getElementById('av-calendar') &&
+      document.getElementById('av-calendar').classList.contains('on')) {
+    renderAppCal();
+  }
+  // Update dashboard
+  renderAppDash();
+}
+
+// -- SYNC PROJECTS TO FAMILY -----------------------------------
+function shareProjectWithFamily(projId) {
+  if (!FB_DB || !FAMILY_CODE) {
+    showAppToast('Join a family space first');
+    return;
+  }
+  var proj = (AD.projects || []).find(function(p) { return p.id === projId; });
+  if (!proj) return;
+
+  var sharedProj = Object.assign({}, proj, {
+    sharedBy: AD.settings.familyName || 'Family',
+    sharedByMember: AD.settings.familyMemberId,
+    sharedAt: Date.now(),
+    family: true
+  });
+
+  FB_DB.ref('seed-families/' + FAMILY_CODE + '/projects/' + projId).set(sharedProj)
+    .then(function() {
+      // Mark local project as shared
+      var localProj = (AD.projects || []).find(function(p) { return p.id === projId; });
+      if (localProj) { localProj.family = true; saveAD(); }
+      renderAppProjects();
+      showAppToast('Project shared with family');
+    })
+    .catch(function(e) { showAppToast('Share failed: ' + e.message); });
+}
+
+function unshareProject(projId) {
+  if (!FB_DB || !FAMILY_CODE) return;
+  FB_DB.ref('seed-families/' + FAMILY_CODE + '/projects/' + projId).remove()
+    .then(function() {
+      var localProj = (AD.projects || []).find(function(p) { return p.id === projId; });
+      if (localProj) { localProj.family = false; saveAD(); }
+      renderAppProjects();
+      showAppToast('Project unshared');
+    });
+}
+
+// Update shared project progress from any family member
+function updateFamilyProjectProgress(projId, progress, status) {
+  if (!FB_DB || !FAMILY_CODE) return;
+  FB_DB.ref('seed-families/' + FAMILY_CODE + '/projects/' + projId).update({
+    progress: progress,
+    status: status,
+    lastUpdated: Date.now(),
+    lastUpdatedBy: AD.settings.familyName || 'Family'
+  });
+}
+
+var FAMILY_PROJECTS = [];
+function mergeFamilyProjects(remoteProjects) {
+  FAMILY_PROJECTS = remoteProjects;
+  if (document.getElementById('av-projects') &&
+      document.getElementById('av-projects').classList.contains('on')) {
+    renderAppProjects();
+  }
+}
+
+// -- FAMILY MEMBERS UI -----------------------------------------
+function renderFamilyMembers(members) {
+  var el = document.getElementById('familyMembersList');
+  if (!el) return;
+  if (!members || !members.length) {
+    el.innerHTML = '<div style="font-size:10px;color:var(--text-dimmer);">No members yet</div>';
+    return;
+  }
+  var now = Date.now();
+  el.innerHTML = members.map(function(m) {
+    var online = m.lastSeen && (now - m.lastSeen) < 5 * 60 * 1000;
+    return '<div class="family-member-chip">' +
+      '<div class="family-sync-dot ' + (online ? '' : 'offline') + '"></div>' +
+      '<span style="font-size:10px">' + (m.name || 'Member') + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+// -- INIT FAMILY ON APP LOAD -----------------------------------
+function initFamilySharing() {
+  FAMILY_CODE = AD.settings.familyCode || null;
+  FAMILY_NAME = AD.settings.familyName || '';
+  if (FAMILY_CODE) {
+    if (initFirebase()) {
+      startFamilyListeners();
+    }
+  }
+  updateFamilyUI();
+}
+
+function updateFamilyUI() {
+  var indicator = document.getElementById('familyIndicator');
+  if (indicator) {
+    if (FAMILY_CODE) {
+      indicator.textContent = FAMILY_ONLINE ? 'Connected: ' + FAMILY_CODE : 'Offline: ' + FAMILY_CODE;
+      indicator.style.color = FAMILY_ONLINE ? 'var(--blue)' : 'var(--text-dimmer)';
+    } else {
+      indicator.textContent = 'No family space';
+      indicator.style.color = 'var(--text-dimmer)';
+    }
+  }
+  var codeDisplay = document.getElementById('familyCodeDisplay');
+  if (codeDisplay) codeDisplay.textContent = FAMILY_CODE || '------';
+
+  // Family events list in family view
+  var evList = document.getElementById('familyEventsList');
+  if (evList && FAMILY_EVENTS.length > 0) {
+    document.getElementById('famEvCount').textContent = FAMILY_EVENTS.length;
+    evList.innerHTML = FAMILY_EVENTS.map(function(ev) {
+      return '<div class="family-event" style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);margin-bottom:2px;">' +
+        '<div style="font-size:11px;color:var(--text);">' + ev.title + '</div>' +
+        '<div style="font-size:10px;color:var(--text-dimmer);">' + ev.date + (ev.time ? ' at ' + ev.time : '') + ' - ' + (ev.sharedBy || 'Family') + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // Family projects list in family view
+  var projList = document.getElementById('familyProjectsList');
+  if (projList && FAMILY_PROJECTS.length > 0) {
+    document.getElementById('famProjCount').textContent = FAMILY_PROJECTS.length;
+    projList.innerHTML = FAMILY_PROJECTS.map(function(p) {
+      return '<div class="family-project" style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);margin-bottom:2px;">' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<div style="font-size:11px;color:var(--text);flex:1;">' + p.name + '</div>' +
+          '<div style="font-size:10px;color:var(--blue);">' + (p.progress || 0) + '%</div>' +
+        '</div>' +
+        '<div style="font-size:10px;color:var(--text-dimmer);">' + (p.sharedBy || 'Family') + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // Show/hide share buttons
+  document.querySelectorAll('.family-share-btn').forEach(function(btn) {
+    btn.style.display = FAMILY_CODE ? 'inline-block' : 'none';
+  });
+}
+
+// -- FAMILY MODAL HANDLER --------------------------------------
+function openFamilyModal() {
+  openAppModal('family');
+}
+
+async function submitFamilyModal(action) {
+  if (action === 'create') {
+    var name = (document.getElementById('fam-name') || {}).value || 'Me';
+    var code = await createFamilySpace(name);
+    if (code) {
+      closeAppModal();
+      document.getElementById('familyCodeDisplay').textContent = code;
+    }
+  } else if (action === 'join') {
+    var code2 = (document.getElementById('fam-code') || {}).value || '';
+    var name2 = (document.getElementById('fam-name2') || {}).value || 'Me';
+    var ok = await joinFamilySpace(code2, name2);
+    if (ok) closeAppModal();
+  } else if (action === 'leave') {
+    leaveFamilySpace();
+    closeAppModal();
+  }
+}
+
+
+// ============================================================
+// HOME SCREEN INSTALL BAR
+// ============================================================
+
+var IB_DISMISSED = false;
+var IB_PROMPT = null;
+
+// Capture Android install prompt
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  IB_PROMPT = e;
+  buildInstallBar();
+});
+
+// Build the install bar content based on platform
+function buildInstallBar() {
+  if (localStorage.getItem('ib_dismissed') === '1') return;
+  if (isInstalledPWA()) {
+    showInstalledState();
+    return;
+  }
+
+  var bar = document.getElementById('homeInstallBar');
+  var btns = document.getElementById('ibBtns');
+  if (!bar || !btns) return;
+
+  var platform = typeof wrDetectPlatform === 'function' ? wrDetectPlatform() : 'android';
+
+  if (platform === 'android' && IB_PROMPT) {
+    btns.innerHTML = '<button class="ib-btn-android" onclick="triggerIBInstall()">&#8681; Add to Home Screen</button>';
+    bar.style.display = 'flex';
+  } else if (platform === 'ios') {
+    btns.innerHTML = '<button class="ib-btn-ios" onclick="showIBSteps()">&#9432; How to Install</button>';
+    bar.style.display = 'flex';
+  } else {
+    // Desktop or unknown - show if prompt available
+    if (IB_PROMPT) {
+      btns.innerHTML = '<button class="ib-btn-android" onclick="triggerIBInstall()">&#8681; Install App</button>';
+      bar.style.display = 'flex';
+    }
+  }
+}
+
+// Trigger Android native install
+function triggerIBInstall() {
+  if (!IB_PROMPT) return;
+  IB_PROMPT.prompt();
+  IB_PROMPT.userChoice.then(function(result) {
+    if (result.outcome === 'accepted') {
+      showInstalledState();
+      IB_PROMPT = null;
+    }
+  });
+}
+
+// Show iOS installation steps in drawer
+function showIBSteps() {
+  var drawer = document.getElementById('ibDrawer');
+  var dc = document.getElementById('ibDrawerContent');
+  if (!drawer || !dc) return;
+
+  dc.innerHTML =
+    '<div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:12px;letter-spacing:0.05em;">Install Seed on iPhone</div>' +
+    '<div class="install-step-row"><div class="install-step-num">1</div><div>Open this page in <strong>Safari</strong> (not Chrome)</div></div>' +
+    '<div class="install-step-row"><div class="install-step-num">2</div><div>Tap the <strong>Share button</strong> &#11023; at the bottom of the screen</div></div>' +
+    '<div class="install-step-row"><div class="install-step-num">3</div><div>Scroll down and tap <strong>Add to Home Screen</strong></div></div>' +
+    '<div class="install-step-row"><div class="install-step-num">4</div><div>Tap <strong>Add</strong>  &mdash;  Seed appears on your home screen</div></div>' +
+    '<div style="font-size:10px;color:var(--text-dimmer);margin-top:10px;line-height:1.8;">Seed runs full screen, works offline, and looks just like a native app.</div>';
+
+  drawer.classList.toggle('on');
+}
+
+// Show "already installed" state
+function showInstalledState() {
+  var bar = document.getElementById('homeInstallBar');
+  var title = document.getElementById('ibTitle');
+  var btns = document.getElementById('ibBtns');
+  if (!bar || !title || !btns) return;
+  title.textContent = 'Seed is installed on your home screen';
+  title.style.color = 'var(--green)';
+  btns.innerHTML = '';
+  bar.style.display = 'flex';
+}
+
+// Dismiss install bar
+function hideInstallBar() {
+  var bar = document.getElementById('homeInstallBar');
+  var drawer = document.getElementById('ibDrawer');
+  if (bar) bar.style.display = 'none';
+  if (drawer) drawer.style.display = 'none';
+  IB_DISMISSED = true;
+  try { localStorage.setItem('ib_dismissed', '1'); } catch(e) {}
+}
+
+// Init on page load
+window.addEventListener('appinstalled', function() {
+  showInstalledState();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Show bar after short delay if no install prompt (iOS or already installed)
+  setTimeout(function() {
+    if (localStorage.getItem('ib_dismissed') === '1') return;
+    if (isInstalledPWA()) { showInstalledState(); return; }
+
+    var platform = typeof wrDetectPlatform === 'function' ? wrDetectPlatform() : 'unknown';
+    if (platform === 'ios') {
+      buildInstallBar();
+    }
+    // Android: bar shows when beforeinstallprompt fires (above)
+  }, 2000);
+});
+
+
+
+
+// ============================================================
+// OPTIONAL ACCOUNT SYSTEM
+// Uses Supabase REST API - no SDK needed
+// Features work fully without signing in
+// Account enables: cross-device sync (future), identity
+// ============================================================
+
+var ACCT_USER = null;   // {id, username, email, token}
+var ACCT_LOADING = false;
+
+// Supabase config - user sets this in Account settings
+// Default is empty - app works fine without it
+var SB_URL = localStorage.getItem('sb_url') || '';
+var SB_KEY = localStorage.getItem('sb_anon_key') || '';
+
+function hasSBConfig() {
+  return SB_URL.length > 10 && SB_KEY.length > 10;
+}
+
+// Sign up with username + email + password
+async function acctSignUp() {
+  var username = (document.getElementById('acctUsername') || {}).value || '';
+  var email = (document.getElementById('acctEmail') || {}).value || '';
+  var password = (document.getElementById('acctPassword') || {}).value || '';
+
+  if (!username.trim() || !email.trim() || !password.trim()) {
+    showAcctError('Please fill in all fields');
+    return;
+  }
+  if (password.length < 8) {
+    showAcctError('Password must be at least 8 characters');
+    return;
+  }
+
+  if (!hasSBConfig()) {
+    // Store locally without server - guest account with username
+    ACCT_USER = { username: username.trim(), email: email.trim(), id: 'local-' + Date.now() };
+    localStorage.setItem('acct_user', JSON.stringify(ACCT_USER));
+    closeAppModal();
+    updateAcctIndicator();
+    showAppToast('Welcome, ' + username + '! Account created locally.');
+    showPostLoginNote();
+    return;
+  }
+
+  setAcctStatus('Creating account...');
+  try {
+    var resp = await fetch(SB_URL + '/auth/v1/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY
+      },
+      body: JSON.stringify({ email: email, password: password,
+        data: { username: username } })
+    });
+    var data = await resp.json();
+    if (data.error) { showAcctError(data.error.message || data.error); return; }
+    ACCT_USER = {
+      id: data.user.id,
+      username: username,
+      email: email,
+      token: data.access_token
+    };
+    localStorage.setItem('acct_user', JSON.stringify(ACCT_USER));
+    closeAppModal();
+    updateAcctIndicator();
+    showAppToast('Welcome, ' + username + '!');
+    showPostLoginNote();
+  } catch(e) {
+    showAcctError('Error: ' + e.message);
+  }
+}
+
+// Sign in
+async function acctSignIn() {
+  var email = (document.getElementById('acctEmailIn') || {}).value || '';
+  var password = (document.getElementById('acctPasswordIn') || {}).value || '';
+
+  if (!email.trim() || !password.trim()) {
+    showAcctError('Enter your email and password');
+    return;
+  }
+
+  // Local-only sign in (no Supabase configured)
+  if (!hasSBConfig()) {
+    var stored = JSON.parse(localStorage.getItem('acct_user') || 'null');
+    if (stored && stored.email === email.trim()) {
+      ACCT_USER = stored;
+      closeAppModal();
+      updateAcctIndicator();
+      showAppToast('Welcome back, ' + ACCT_USER.username + '!');
+      return;
+    }
+    showAcctError('Account not found on this device');
+    return;
+  }
+
+  setAcctStatus('Signing in...');
+  try {
+    var resp = await fetch(SB_URL + '/auth/v1/token?grant_type=password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY
+      },
+      body: JSON.stringify({ email: email, password: password })
+    });
+    var data = await resp.json();
+    if (data.error || data.error_description) {
+      showAcctError(data.error_description || data.error);
+      return;
+    }
+    ACCT_USER = {
+      id: data.user.id,
+      username: (data.user.user_metadata || {}).username || data.user.email.split('@')[0],
+      email: data.user.email,
+      token: data.access_token
+    };
+    localStorage.setItem('acct_user', JSON.stringify(ACCT_USER));
+    closeAppModal();
+    updateAcctIndicator();
+    showAppToast('Welcome back, ' + ACCT_USER.username + '!');
+  } catch(e) {
+    showAcctError('Error: ' + e.message);
+  }
+}
+
+// Sign out
+function acctSignOut() {
+  ACCT_USER = null;
+  localStorage.removeItem('acct_user');
+  updateAcctIndicator();
+  showAppToast('Signed out');
+  closeAppModal();
+}
+
+// Load saved session on app open
+function initAccount() {
+  var stored = localStorage.getItem('acct_user');
+  if (stored) {
+    try { ACCT_USER = JSON.parse(stored); } catch(e) {}
+  }
+  updateAcctIndicator();
+}
+
+// Update the topbar indicator
+function updateAcctIndicator() {
+  var ind = document.getElementById('acctIndicator');
+  if (!ind) return;
+  if (ACCT_USER) {
+    ind.textContent = ACCT_USER.username || ACCT_USER.email.split('@')[0];
+    ind.classList.add('signed-in');
+    ind.title = 'Signed in as ' + ACCT_USER.email;
+  } else {
+    ind.textContent = 'Guest';
+    ind.classList.remove('signed-in');
+    ind.title = 'Sign in or create account';
+  }
+}
+
+// Show account modal
+function showAccountModal() {
+  openAppModal('account');
+}
+
+// Show gentle post-login note
+function showPostLoginNote() {
+  // Nothing to do yet - placeholder for future sync
+}
+
+// Helper: show error in modal
+function showAcctError(msg) {
+  var el = document.getElementById('acctError');
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+  var status = document.getElementById('acctStatus');
+  if (status) status.textContent = '';
+}
+
+function setAcctStatus(msg) {
+  var el = document.getElementById('acctStatus');
+  if (el) el.textContent = msg;
+  var err = document.getElementById('acctError');
+  if (err) err.style.display = 'none';
+}
+
+// Switch tab in account modal
+function switchAcctTab(tab) {
+  document.querySelectorAll('.acct-tab').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  document.querySelectorAll('.acct-panel').forEach(function(p) {
+    p.classList.toggle('on', p.id === 'acctPanel-' + tab);
+  });
+  var err = document.getElementById('acctError');
+  if (err) err.style.display = 'none';
+}
+
 </script>
 
 <!-- WILD ROBOT -->
@@ -6163,34 +7450,7 @@ function removeGroceryItem(id) {
 </div>
 
 
-<!-- INSTALL BANNER -->
-<div class="install-banner" id="installBanner">
-  <div class="install-banner-top">
-    <div class="install-banner-info">
-      <div class="install-banner-title">
-        <span>Seed</span>
-        <div class="r1-badge"><div class="r1-dot"></div>R1-v3</div>
-      </div>
-      <div class="install-banner-sub">Install as an app &mdash; runs offline &mdash; no app store needed</div>
-    </div>
-    <button class="install-btn-dismiss" onclick="dismissInstall()" aria-label="Dismiss" style="font-size:18px;padding:6px 12px;font-weight:bold;">&times; Skip</button>
-  </div>
-  <div class="install-feature-row">
-    <div class="install-feature">Offline ready</div>
-    <div class="install-feature">Encrypted data</div>
-    <div class="install-feature">R1-v3 local AI</div>
-    <div class="install-feature">No account needed</div>
-  </div>
-  <div class="install-banner-btns" id="installBtns">
-    <!-- Populated by JS based on platform -->
-  </div>
-  <div class="install-steps" id="installSteps"></div>
-  <div style="text-align:center;margin-top:6px;">
-    <button onclick="dismissInstall()" style="background:none;border:none;color:var(--text-dimmer);font-family:var(--font-m);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;padding:6px 12px;text-decoration:underline;">
-      Skip install — just open the app
-    </button>
-  </div>
-</div>
+<!-- Install banner removed - no longer blocks launch -->
 
 </body>
 </html>
