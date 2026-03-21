@@ -3250,21 +3250,7 @@ initWildRobot();
 
 
 // Auto-highlight platform button on page load
-document.addEventListener('DOMContentLoaded', function() {
-  var p = wrDetectPlatform();
-  if (p === 'ios') {
-    var b = document.getElementById('btnIos');
-    if (b) b.classList.add('active');
-    // Update hero button label
-    var hBtn = document.querySelector('.cta-primary');
-    if (hBtn) hBtn.textContent = 'Launch for iPhone';
-  } else if (p === 'android') {
-    var b2 = document.getElementById('btnAndroid');
-    if (b2) b2.classList.add('active');
-    var hBtn2 = document.querySelector('.cta-primary');
-    if (hBtn2) hBtn2.textContent = 'Launch for Android';
-  }
-});
+// Platform detection listener removed (landing page dead code)
 
 
 // -- API KEY MANAGEMENT -------------------------------------
@@ -4321,7 +4307,7 @@ function workerRunStep(callId, stepLabel, url, headers, body) {
 
 // Initialize when app loads
 document.addEventListener('DOMContentLoaded', function() {
-  initAIWorker();
+  try { initAIWorker(); } catch(e) { console.log('[SEED] AIWorker:', e.message); }
 });
 
 
@@ -6835,19 +6821,8 @@ window.addEventListener('appinstalled', function() {
   showInstalledState();
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-  // Show bar after short delay if no install prompt (iOS or already installed)
-  setTimeout(function() {
-    if (localStorage.getItem('ib_dismissed') === '1') return;
-    if (isInstalledPWA()) { showInstalledState(); return; }
+// Install banner listener removed (feature removed)
 
-    var platform = typeof wrDetectPlatform === 'function' ? wrDetectPlatform() : 'unknown';
-    if (platform === 'ios') {
-      buildInstallBar();
-    }
-    // Android: bar shows when beforeinstallprompt fires (above)
-  }, 2000);
-});
 
 
 
