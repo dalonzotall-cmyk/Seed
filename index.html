@@ -1112,6 +1112,7 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
 <body>
 
 <!-- NAV -->
+<div id="landingPage">
 <nav id="nav">
   <a href="#" class="nav-logo">Seed</a>
   <ul class="nav-links">
@@ -1401,19 +1402,6 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
 </footer>
 
 
-<!-- HOME SCREEN INSTALL BAR - bottom of landing page -->
-<div class="install-bar" id="homeInstallBar">
-  <div class="install-bar-text">
-    <div class="install-bar-title" id="ibTitle">Add Seed to your home screen</div>
-    <div class="install-bar-sub" id="ibSub">Works offline &middot; No app store &middot; Free</div>
-  </div>
-  <div class="install-bar-btns" id="ibBtns">
-    <!-- Populated by JS based on platform -->
-  </div>
-  <button class="ib-dismiss" onclick="hideInstallBar()" title="Dismiss">&times;</button>
-</div>
-<div class="install-steps-drawer" id="ibDrawer">
-  <div id="ibDrawerContent"></div>
 </div>
 
 <!-- LOCK SCREEN OVERLAY -->
@@ -1512,6 +1500,8 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
       <div style="border-top:1px solid var(--border);">
         <div class="sni" onclick="exportAppData()"><span class="sni-icon">↓</span><span class="sni-label">Export</span></div>
         <div class="sni" id="sni-apikey" onclick="promptApiKey()"><span class="sni-icon">&#128273;</span><span class="sni-label">API Key</span></div>
+        <div class="sni" onclick="window.location.href='/?about=1'" title="Landing page"><span class="sni-icon">&#8505;</span><span class="sni-label">About Seed</span></div>
+        <div class="sni" onclick="promptSetPassword()" title="Set or change lock password"><span class="sni-icon">&#128274;</span><span class="sni-label">Lock / Password</span></div>
         <div class="sni" onclick="showAppCustomize()"><span class="sni-icon">◑</span><span class="sni-label">Customize</span></div>
       </div>
     </div>
@@ -4352,6 +4342,18 @@ function getExtendedModalTemplate(type, data) {
         '<div class="macts"><button class="mcanc" onclick="closeAppModal()">Cancel</button><button class="msave" onclick="acctSignIn()">Sign In</button></div>' +
       '</div>';
   }
+  if (type === 'setpassword') {
+    var hasLock = !!localStorage.getItem(DBKEY);
+    return '<div style="font-family:var(--font-d);font-size:22px;font-weight:300;margin-bottom:18px;">' +
+      (hasLock ? 'Change' : 'Set') + ' <em style="font-style:italic;color:var(--gold);">Lock Password</em></div>' +
+      '<div style="font-size:10px;color:var(--text-dimmer);line-height:1.8;margin-bottom:14px;">Your password encrypts all your data locally. Nobody else can read it.</div>' +
+      '<div class="mfg"><label class="mflbl">New Password</label><input class="mfi" id="newPwInput" type="password" placeholder="at least 4 characters" autocomplete="new-password"></div>' +
+      '<div class="mfg"><label class="mflbl">Confirm Password</label><input class="mfi" id="newPwConfirm" type="password" placeholder="repeat password" autocomplete="new-password"></div>' +
+      '<div class="macts">' +
+        (hasLock ? '<button class="mcanc" onclick="removeLock()" style="color:var(--red);">Remove Lock</button>' : '<button class="mcanc" onclick="closeAppModal()">Skip</button>') +
+        '<button class="msave" onclick="saveNewPassword()">Set Password</button>' +
+      '</div>';
+  }
   return '';
 }
 
@@ -7128,20 +7130,27 @@ function buildInstallBar() {
   var btns = document.getElementById('ibBtns');
   if (!bar || !btns) return;
 
-  var platform = typeof wrDetectPlatform === 'function' ? wrDetectPlatform() : 'android';
+  var platform = typeof wrDetectPlatform === 'function' ? wrDetectPlatform() : 'unknown';
 
-  if (platform === 'android' && IB_PROMPT) {
-    btns.innerHTML = '<button class="ib-btn-android" onclick="triggerIBInstall()">&#8681; Add to Home Screen</button>';
-    bar.style.display = 'flex';
-  } else if (platform === 'ios') {
-    btns.innerHTML = '<button class="ib-btn-ios" onclick="showIBSteps()">&#9432; How to Install</button>';
-    bar.style.display = 'flex';
-  } else {
-    // Desktop or unknown - show if prompt available
-    if (IB_PROMPT) {
-      btns.innerHTML = '<button class="ib-btn-android" onclick="triggerIBInstall()">&#8681; Install App</button>';
-      bar.style.display = 'flex';
-    }
+  // Always show both platform buttons - highlight detected platform
+  var androidHighlight = (platform === 'android') ? 'class="ib-btn-android"' : 'class="ib-btn-ios"';
+  var iosHighlight = (platform === 'ios') ? 'class="ib-btn-android"' : 'class="ib-btn-ios"';
+
+  btns.innerHTML =
+    '<button ' + androidHighlight + ' onclick="showIBAndroid()" style="display:flex;align-items:center;gap:6px;">' +
+      '&#9654; Android' +
+    '</button>' +
+    '<button ' + iosHighlight + ' onclick="showIBIOS()" style="display:flex;align-items:center;gap:6px;">' +
+      '&#63743; iPhone' +
+    '</button>';
+
+  bar.style.display = 'flex';
+
+  // Auto-expand the detected platform
+  if (platform === 'ios') {
+    showIBIOS();
+  } else if (platform === 'android') {
+    showIBAndroid();
   }
 }
 
@@ -7416,6 +7425,129 @@ function switchAcctTab(tab) {
   });
   var err = document.getElementById('acctError');
   if (err) err.style.display = 'none';
+}
+
+
+
+// ============================================================
+// AUTO-START: Skip lock screen if no password set
+// Show landing page only if ?about=1 in URL
+// ============================================================
+
+function autoStart() {
+  var params = new URLSearchParams(window.location.search);
+
+  // If ?about=1, show landing page (for sharing/about)
+  if (params.get('about') === '1') {
+    // Show landing page normally - do nothing
+    return;
+  }
+
+  // Check if a password/encryption key was previously set
+  var hasPassword = !!localStorage.getItem(DBKEY);
+
+  if (hasPassword) {
+    // User has encrypted data - show lock screen
+    var overlay = document.getElementById('lockOverlay');
+    if (overlay) {
+      overlay.style.display = 'block';
+      overlay.style.position = 'fixed';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.right = '0';
+      overlay.style.bottom = '0';
+      overlay.style.zIndex = '500';
+      overlay.style.background = 'var(--bg)';
+      overlay.style.overflowY = 'auto';
+    }
+    setTimeout(function() {
+      var pw = document.getElementById('lockPw');
+      if (pw) pw.focus();
+    }, 100);
+  } else {
+    // No password - launch directly into app
+    launchDirect();
+  }
+}
+
+function launchDirect() {
+  // Load AD from unencrypted localStorage
+  var stored = localStorage.getItem('seed_data_plain');
+  if (stored) {
+    try { AD = JSON.parse(stored); } catch(e) {}
+  }
+  // Show app overlay
+  var lp = document.getElementById('landingPage');
+  if (lp) lp.style.display = 'none';
+  var app = document.getElementById('appOverlay');
+  if (app) {
+    app.style.display = 'flex';
+  }
+  initApp();
+}
+
+// Override saveAD to also save unencrypted copy when no password
+var _origSaveAD = null;
+function initSaveHook() {
+  _origSaveAD = saveAD;
+  saveAD = async function() {
+    if (!CK) {
+      // No encryption key - save as plain JSON
+      try {
+        localStorage.setItem('seed_data_plain', JSON.stringify(AD));
+      } catch(e) {}
+      return;
+    }
+    return _origSaveAD.apply(this, arguments);
+  };
+}
+
+// Handle ?view= shortcuts from manifest
+function handleViewParam() {
+  var params = new URLSearchParams(window.location.search);
+  var view = params.get('view');
+  if (view) {
+    // Will be called after initApp
+    setTimeout(function() {
+      if (typeof showAppView === 'function') showAppView(view);
+    }, 300);
+  }
+}
+
+// Run on DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+  initSaveHook();
+  handleViewParam();
+  autoStart();
+});
+
+
+
+// Set / change lock password
+function promptSetPassword() {
+  openAppModal('setpassword');
+}
+
+async function saveNewPassword() {
+  var pw = (document.getElementById('newPwInput') || {}).value || '';
+  var confirm = (document.getElementById('newPwConfirm') || {}).value || '';
+  if (!pw) { showAppToast('Enter a password'); return; }
+  if (pw !== confirm) { showAppToast('Passwords do not match'); return; }
+  if (pw.length < 4) { showAppToast('Password must be at least 4 characters'); return; }
+  CK = await deriveKey(pw);
+  await saveAD();
+  showAppToast('Password set - your data is now encrypted');
+  closeAppModal();
+}
+
+function removeLock() {
+  if (!confirm('Remove password? Your data will still be saved locally but without encryption.')) return;
+  CK = null;
+  localStorage.removeItem(DBKEY);
+  // Save as plain
+  try { localStorage.setItem('seed_data_plain', JSON.stringify(AD)); } catch(e) {}
+  showAppToast('Lock removed');
+  closeAppModal();
 }
 
 </script>
