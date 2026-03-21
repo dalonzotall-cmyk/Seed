@@ -1,26 +1,75 @@
 {
   "name": "Seed - Personal OS",
   "short_name": "Seed",
-  "description": "Constitutional AI personal OS. Schedule, Tasks, Calendar, Notes, Journal, Alarms, Projects. Powered by R1-v3.",
-  "start_url": "/",
-  "scope": "/",
+  "description": "Constitutional AI personal OS. Powered by R1-v3.",
+  "start_url": "/Seed/",
+  "scope": "/Seed/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#090907",
   "theme_color": "#090907",
-  "categories": ["productivity", "utilities"],
+  "categories": [
+    "productivity",
+    "utilities"
+  ],
   "icons": [
     {
-      "src": "/icon-192.svg",
+      "src": "/Seed/icon-192.svg",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/icon-512.svg",
+      "src": "/Seed/icon-512.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Today's Tasks",
+      "short_name": "Tasks",
+      "url": "/Seed/?view=tasks",
+      "icons": [
+        {
+          "src": "/Seed/icon-192.svg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Add Alarm",
+      "short_name": "Alarm",
+      "url": "/Seed/?view=alarms",
+      "icons": [
+        {
+          "src": "/Seed/icon-192.svg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Groceries",
+      "short_name": "Groceries",
+      "url": "/Seed/?view=groceries",
+      "icons": [
+        {
+          "src": "/Seed/icon-192.svg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "AI Chat",
+      "short_name": "AI",
+      "url": "/Seed/?view=home",
+      "icons": [
+        {
+          "src": "/Seed/icon-192.svg",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
   "screenshots": [],
