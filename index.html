@@ -1,6 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+// SW KILLER - runs first, kills any cached service worker
+(function() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+      regs.forEach(function(reg) {
+        reg.unregister();
+        console.log('Unregistered SW:', reg.scope);
+      });
+    });
+    // Also clear all caches
+    if ('caches' in window) {
+      caches.keys().then(function(names) {
+        names.forEach(function(name) {
+          caches.delete(name);
+          console.log('Deleted cache:', name);
+        });
+      });
+    }
+  }
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,25 +35,19 @@
 <link rel="apple-touch-icon" href="/icon-192.svg">
 <link rel="icon" type="image/svg+xml" sizes="192x192" href="/icon-192.svg">
 <title>Seed — Built to amplify what is already in you</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
 <!-- Firebase for family sharing -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+
+
 
 <!-- mammoth.js: read .docx files in browser -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js">
-  import * as webllm from "https://esm.run/@mlc-ai/web-llm";
-  window.WebLLM = webllm;
-  window.WebLLMReady = true;
-  var evt = new CustomEvent('webllm-ready');
-  document.dispatchEvent(evt);
-</script>
+
 <!-- SheetJS: read .xlsx/.xls files in browser -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <!-- jsPDF: generate PDF downloads in browser -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <!-- WebLLM for local in-browser AI -->
 
 <style>
@@ -1110,297 +1126,18 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
 </style>
 </head>
 <body>
+<!-- Immediate loading screen - pure CSS, no JS needed, removes when app loads -->
+<div id="seedLoader" style="position:fixed;inset:0;background:#090907;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+  <div style="font-family:Georgia,serif;font-size:48px;font-weight:300;letter-spacing:0.4em;color:#c8a96e;">Seed</div>
+  <div style="font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:#5a5a58;">Loading...</div>
+  <div style="width:120px;height:1px;background:#1e1e1c;margin-top:8px;overflow:hidden;">
+    <div style="height:100%;background:#c8a96e;animation:ld 1.5s ease-in-out infinite;width:40%;"></div>
+  </div>
+</div>
+<style>@keyframes ld{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}</style>
 
 <!-- NAV -->
-<div id="landingPage" style="display:none;">
-<nav id="nav">
-  <a href="#" class="nav-logo">Seed</a>
-  <ul class="nav-links">
-    <li><a href="#timeline">Build</a></li>
-    <li><a href="#foundation">Foundation</a></li>
-    <li><a href="#blog">Blog</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-  <button class="nav-launch" onclick="launchApp()">Launch App</button>
-</nav>
-
-<!-- HERO -->
-<div class="hero">
-  <p class="hero-tag">Est. 2025 — Built by Red</p>
-  <h1 class="hero-title">AI is an amplifier<br>of <em>human potential.</em><br>It has to be built right.</h1>
-  <p class="hero-body">Every piece of knowledge, creativity, and understanding humanity has ever produced lives inside these systems. That makes them the most powerful tool ever built. A flawed amplifier does not just underperform — it distorts. Everything here exists to make sure it does not.</p>
-  <div class="hero-meta">
-    <div class="meta-item"><div class="meta-num">10</div><div class="meta-label">Weeks to build</div></div>
-    <div class="meta-item"><div class="meta-num">827</div><div class="meta-label">Authorities catalogued</div></div>
-    <div class="meta-item"><div class="meta-num">68k</div><div class="meta-label">Reasoning items</div></div>
-    <div class="meta-item"><div class="meta-num">0</div><div class="meta-label">External dependencies</div></div>
-  </div>
-  <div class="hero-cta">
-    <button class="cta-primary" onclick="launchApp()" id="heroLaunchBtn">Launch Seed App</button>
-    <a href="#timeline" class="cta-ghost">See the build →</a>
-  </div>
-  <div class="hero-scroll">Scroll to explore</div>
-</div>
-
-<!-- INTRO -->
-<div class="intro-strip reveal">
-  <div><h2>Started the same way it starts for <em>everyone.</em></h2></div>
-  <div>
-    <p>Just trying it out. Then the potential became real. Then the flaws became visible — not surface flaws but structural ones. The kind that do not get fixed by making better rules or writing better prompts.</p>
-    <p>So the question changed. Not how do I use this — but how do I build it right. For a family. For people who deserve a clean tool. For everyone who should have access to something that actually works.</p>
-  </div>
-</div>
-
-<!-- TIMELINE -->
-<div class="timeline-section" id="timeline">
-  <div class="timeline-header reveal">
-    <p class="section-label">The Build</p>
-    <h2>From the first question<br>to a complete architecture.</h2>
-  </div>
-  <div class="timeline">
-
-    <div class="titem">
-      <div class="tleft"><div class="tperiod">Jan<br>2026</div></div>
-      <div class="tright"><div class="tcard">
-        <div class="tstatus s-complete"><div class="sdot"></div>Complete</div>
-        <div class="ttitle">Sovereign Lens System</div>
-        <div class="tdesc">The reasoning foundation. A structured knowledge architecture spanning every major domain of human understanding — science, philosophy, law, medicine, engineering, art, and systems theory. Built so any question routes to the right depth of knowledge rather than a generic response.</div>
-        <div class="ttags"><span class="ttag">Knowledge Architecture</span><span class="ttag">34 Lenses</span><span class="ttag">4 Tiers</span><span class="ttag">68,000 Items</span></div>
-        <div class="tmilestone">Foundation layer — everything built after this runs on top of it</div>
-      </div></div>
-    </div>
-
-    <div class="titem">
-      <div class="tleft"><div class="tperiod">Jan<br>2026</div></div>
-      <div class="tright"><div class="tcard">
-        <div class="tstatus s-complete"><div class="sdot"></div>Complete</div>
-        <div class="ttitle">Sovereign Orchestrator</div>
-        <div class="tdesc">Takes a high-level goal and breaks it into a validated, executable plan with a full audit trail. Every decision is logged. Every step is verifiable. Deterministic — the same input always produces the same output. Built to run completely offline with zero external dependencies.</div>
-        <div class="ttags"><span class="ttag">Pure Python</span><span class="ttag">4,300+ Lines</span><span class="ttag">Offline-First</span><span class="ttag">Auditable</span></div>
-        <div class="tmilestone">Zero external dependencies — runs on Oracle Cloud free tier</div>
-      </div></div>
-    </div>
-
-    <div class="titem">
-      <div class="tleft"><div class="tperiod">Jan–Feb<br>2026</div></div>
-      <div class="tright"><div class="tcard">
-        <div class="tstatus s-complete"><div class="sdot"></div>Complete</div>
-        <div class="ttitle">System B — Meta Execution Layer</div>
-        <div class="tdesc">The layer that makes sure plans actually execute correctly in the real world. Validates before running. Simulates outcomes before committing. Adapts to whatever hardware it runs on. Replays exactly when something needs reviewing. Injects controlled failures to harden the system rather than hoping nothing breaks.</div>
-        <div class="ttags"><span class="ttag">Validator</span><span class="ttag">Simulator</span><span class="ttag">Hardware Adapter</span><span class="ttag">Replay Engine</span><span class="ttag">Failure Injector</span></div>
-        <div class="tmilestone">Sub-100ms validation · 99.99% replay accuracy · Zero silent failures</div>
-      </div></div>
-    </div>
-
-    <div class="titem">
-      <div class="tleft"><div class="tperiod">Feb<br>2026</div></div>
-      <div class="tright"><div class="tcard">
-        <div class="tstatus s-complete"><div class="sdot"></div>Complete</div>
-        <div class="ttitle">Sovereign Brain</div>
-        <div class="tdesc">A constitutional AI system for biblical animation. Built around a strict authority hierarchy where Scripture governs everything below it. Characters governed by their own dedicated lens for consistency across every scene. Supernatural events only occur when Scripture explicitly authorizes them.</div>
-        <div class="ttags"><span class="ttag">Constitutional Hierarchy</span><span class="ttag">Character Lenses</span><span class="ttag">Zero Hallucination</span><span class="ttag">Family Safe</span></div>
-        <div class="tmilestone">Full stress test — zero violations across all constitutional rules</div>
-      </div></div>
-    </div>
-
-    <div class="titem">
-      <div class="tleft"><div class="tperiod">Feb<br>2026</div></div>
-      <div class="tright"><div class="tcard">
-        <div class="tstatus s-complete"><div class="sdot"></div>Complete</div>
-        <div class="ttitle">Sovereign Diagnostic System V3.0</div>
-        <div class="tdesc">Built to solve a specific problem — AI systems produce structured confident-looking output whether the information is grounded or fabricated. This framework forces every claim to carry a confidence declaration. Confirmed. Approximate. Unknown. No variable appears without one — ever. Went from 3 of 13 health dimensions passing to 13 of 13.</div>
-        <div class="ttags"><span class="ttag">Confidence Tagging</span><span class="ttag">Constitutional Reasoning</span><span class="ttag">Honest by Design</span><span class="ttag">13/13 Health</span></div>
-        <div class="tmilestone">The framework the AI in this app runs through on every response</div>
-      </div></div>
-    </div>
-
-    <div class="titem">
-      <div class="tleft"><div class="tperiod">Feb–Mar<br>2026</div></div>
-      <div class="tright"><div class="tcard">
-        <div class="tstatus s-complete"><div class="sdot"></div>Complete</div>
-        <div class="ttitle">Termux Mini Orchestrator</div>
-        <div class="tdesc">A working AI orchestration system running locally on an Android phone. No API key. No internet required. No subscription. The full constitutional DNA of the Sovereign Lens System embedded in the architecture — not as a prompt suggestion but as a structural guarantee. Proved the whole stack can run on a phone.</div>
-        <div class="ttags"><span class="ttag">Android</span><span class="ttag">Termux</span><span class="ttag">Ollama</span><span class="ttag">No API Key</span><span class="ttag">Offline</span></div>
-        <div class="tmilestone">Full constitutional enforcement on resource-constrained mobile hardware</div>
-      </div></div>
-    </div>
-
-    <div class="titem">
-      <div class="tleft"><div class="tperiod">Mar<br>2026</div></div>
-      <div class="tright"><div class="tcard">
-        <div class="tstatus s-live"><div class="sdot"></div>Live</div>
-        <div class="ttitle">Sovereign Seed V27.15 — Standalone</div>
-        <div class="tdesc">The complete system. 827 authorities across every human domain. 4,045 cognitive skills. 667 domains. A full web layer with 13 API endpoints. An automated installer that works across Oracle Cloud, Linux, macOS, Windows, and Android. Everything brought into one coherent deployable system.</div>
-        <div class="ttags"><span class="ttag">827 Authorities</span><span class="ttag">Cross-Platform</span><span class="ttag">13 API Endpoints</span><span class="ttag">SQLite</span></div>
-        <div class="tmilestone">29/29 routing tests passed · Zero errors · Zero violations · Confidence 1.00</div>
-      </div></div>
-    </div>
-
-    <div class="titem">
-      <div class="tleft"><div class="tperiod">Mar<br>2026</div></div>
-      <div class="tright"><div class="tcard">
-        <div class="tstatus s-live"><div class="sdot"></div>Live</div>
-        <div class="ttitle">Safety Research — The Convergence Threshold</div>
-        <div class="tdesc">A precise framework for understanding when AI systems cross from useful to dangerous. Not a philosophical argument — a structural map. Four conditions that have to exist simultaneously for dangerous emergent behavior to become operational. A specific intervention point that makes the rest unreachable if addressed at the architecture level.</div>
-        <div class="ttags"><span class="ttag">AI Safety</span><span class="ttag">Instrumental Convergence</span><span class="ttag">Architectural Prevention</span><span class="ttag">Submitted to Anthropic</span></div>
-        <div class="tmilestone">Independently validated by Gemini alignment research review</div>
-      </div></div>
-    </div>
-
-  </div>
-</div>
-
-<!-- FOUNDATION -->
-<div class="foundation-section" id="foundation">
-  <div class="foundation-inner">
-    <div class="fl reveal">
-      <p class="section-label">The Safety Foundation</p>
-      <h2>The rules live inside the same reasoning they are meant to <em>contain.</em></h2>
-      <p>That is the problem nobody is solving correctly. Better rules. Better alignment training. Better prompts. None of it touches the structural issue.</p>
-      <p>The danger is not how much a system knows. It is four specific conditions existing at the same time. One of them is the kill point — the condition that has to be prevented at the architecture level before the others can ever converge.</p>
-    </div>
-    <div class="fr">
-      <div class="fitem reveal"><div class="fnum">01</div><div class="fcon"><h3>Domain Depth at Critical Intersections</h3><p>Not total knowledge. Security, systems architecture, social engineering, and infrastructure reaching depth simultaneously. Each alone is manageable. The intersection is not.</p></div></div>
-      <div class="fitem reveal"><div class="fnum">02</div><div class="fcon"><h3>Persistent Goal Pursuit — The Kill Point</h3><p>Without this everything else stays theoretical. Once a system can hold a goal across sessions self-preservation becomes operational. Architecture. Not policy. Not alignment training.</p></div></div>
-      <div class="fitem reveal"><div class="fnum">03</div><div class="fcon"><h3>Agentic Tool Access Without Action Gates</h3><p>Read access is manageable. Write access to consequential systems without human confirmation at irreversible points is the crossing line. This is where reasoning becomes reality.</p></div></div>
-      <div class="fitem reveal"><div class="fnum">04</div><div class="fcon"><h3>Federated Emergent Collective Reasoning</h3><p>By the time this condition exists you are negotiating with something that can negotiate back. Individual nodes under constitutional constraint can produce collective behavior no individual framework governs.</p></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- BLOG -->
-<div class="blog-section" id="blog">
-  <div class="reveal">
-    <p class="section-label">From the Build</p>
-    <h2 style="font-family:var(--font-d);font-size:clamp(28px,3.5vw,44px);font-weight:300;line-height:1.2;">The work, documented as it happens.</h2>
-  </div>
-  <div class="blog-grid">
-    <a href="#" class="bcard reveal">
-      <div class="btag">Coming Soon — Origin</div>
-      <div class="btitle">Ten Weeks. One Person. Broken Hardware. Here Is What That Actually Looks Like.</div>
-      <div class="bexcerpt">No team. No funding. No institution. An Android phone and a damaged Chromebook. This is the real story of how all of this got built — and why it started with a family, not a business plan.</div>
-      <div class="barrow">Read when live →</div>
-    </a>
-    <a href="#" class="bcard reveal">
-      <div class="btag">Coming Soon — Safety</div>
-      <div class="btitle">Why Everyone Is Solving the Wrong Safety Problem and What the Actual Threshold Is.</div>
-      <div class="bexcerpt">The danger is not a knowledge percentage. It is four conditions existing simultaneously. Here is the precise map — and the one condition that makes the rest unreachable if you stop it first.</div>
-      <div class="barrow">Read when live →</div>
-    </a>
-  </div>
-</div>
-
-<!-- CONTACT -->
-<div class="contact-section" id="contact">
-  <h2>The work is done.<br>What comes next is <em>collaboration.</em></h2>
-  <p>Resources. Research partners. People who understand what constitutional AI architecture means and want to build on what already exists. If that is you — this is worth a conversation.</p>
-  <a href="/cdn-cgi/l/email-protection#9bfffaf7f4f5e1f4effaf7f7dbfcf6faf2f7b5f8f4f6" class="contact-link">✉ Email Red</a>
-</div>
-
-<!-- LAUNCH GATE -->
-<div class="launch-gate" id="launch-gate">
-  <h2>Ready to use <em>Seed?</em></h2>
-  <p style="max-width:520px;margin:0 auto 32px;font-size:12px;color:var(--text-dim);line-height:1.9;">
-    Schedule, Tasks, Calendar, Notes, Journal, Alarms, Projects and the Wild Robot AI.
-    All encrypted. All yours. Runs in your browser — no install required.
-  </p>
-  <button onclick="launchApp()" style="
-    background:var(--gold);color:var(--bg);border:none;
-    font-family:var(--font-m);font-size:12px;letter-spacing:0.2em;text-transform:uppercase;
-    padding:18px 48px;cursor:pointer;transition:all 0.2s;
-    display:inline-block;margin-bottom:16px;
-  ">Launch Seed App</button>
-  <div style="font-size:10px;color:var(--text-dimmer);letter-spacing:0.1em;margin-top:8px;">
-    Works on Android and iPhone &mdash; no account needed
-  </div>
-  <div style="margin-top:20px;display:inline-flex;align-items:center;gap:8px;
-    background:rgba(74,124,89,0.12);border:1px solid var(--green-dim);
-    padding:5px 14px;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--green);">
-    <div style="width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;"></div>
-    Powered by R1-v3 &mdash; Sovereign Diagnostic V3.0
-  </div>
-</div>
-
-<!-- FOOTER -->
-
-<!-- INSTALL GUIDE SECTION -->
-<div id="install-guide" style="border-top:1px solid var(--border);padding:80px 48px;background:var(--surface);">
-  <div style="max-width:900px;margin:0 auto;">
-    <p style="font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:16px;display:flex;align-items:center;gap:16px;">How to Install <span style="display:block;width:40px;height:1px;background:var(--gold-dim);"></span></p>
-    <h2 style="font-family:var(--font-d);font-size:clamp(28px,3.5vw,44px);font-weight:300;line-height:1.2;margin-bottom:40px;">Add Seed to your home screen.<br>No app store. <em style="font-style:italic;color:var(--gold);">One tap.</em></h2>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-
-      <!-- ANDROID -->
-      <div style="background:var(--bg);border:1px solid var(--border);padding:32px;">
-        <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-dim);margin-bottom:20px;display:flex;align-items:center;gap:10px;">
-          <span style="font-size:18px;">&#9654;</span> Android
-        </div>
-        <div style="display:flex;flex-direction:column;gap:14px;">
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <div style="font-family:var(--font-d);font-size:22px;font-weight:300;color:var(--gold-dim);min-width:24px;">1</div>
-            <div style="font-size:12px;color:var(--text-dim);line-height:1.8;">Open this page in <strong style="color:var(--text);">Chrome</strong> on your Android device</div>
-          </div>
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <div style="font-family:var(--font-d);font-size:22px;font-weight:300;color:var(--gold-dim);min-width:24px;">2</div>
-            <div style="font-size:12px;color:var(--text-dim);line-height:1.8;">Tap the <strong style="color:var(--text);">menu &#8942;</strong> in the top right corner</div>
-          </div>
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <div style="font-family:var(--font-d);font-size:22px;font-weight:300;color:var(--gold-dim);min-width:24px;">3</div>
-            <div style="font-size:12px;color:var(--text-dim);line-height:1.8;">Tap <strong style="color:var(--text);">Add to Home screen</strong></div>
-          </div>
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <div style="font-family:var(--font-d);font-size:22px;font-weight:300;color:var(--gold-dim);min-width:24px;">4</div>
-            <div style="font-size:12px;color:var(--text-dim);line-height:1.8;">Tap <strong style="color:var(--text);">Add</strong> &mdash; Seed appears on your home screen instantly</div>
-          </div>
-        </div>
-        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
-          <div style="font-size:10px;color:var(--green);letter-spacing:0.08em;">R1-v3 local AI loads automatically on Android Chrome with WebGPU</div>
-        </div>
-      </div>
-
-      <!-- IPHONE -->
-      <div style="background:var(--bg);border:1px solid var(--border);padding:32px;">
-        <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-dim);margin-bottom:20px;display:flex;align-items:center;gap:10px;">
-          <span style="font-size:18px;">&#63743;</span> iPhone
-        </div>
-        <div style="display:flex;flex-direction:column;gap:14px;">
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <div style="font-family:var(--font-d);font-size:22px;font-weight:300;color:var(--gold-dim);min-width:24px;">1</div>
-            <div style="font-size:12px;color:var(--text-dim);line-height:1.8;">Open this page in <strong style="color:var(--text);">Safari</strong> on your iPhone</div>
-          </div>
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <div style="font-family:var(--font-d);font-size:22px;font-weight:300;color:var(--gold-dim);min-width:24px;">2</div>
-            <div style="font-size:12px;color:var(--text-dim);line-height:1.8;">Tap the <strong style="color:var(--text);">Share button</strong> at the bottom of Safari &#11023;</div>
-          </div>
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <div style="font-family:var(--font-d);font-size:22px;font-weight:300;color:var(--gold-dim);min-width:24px;">3</div>
-            <div style="font-size:12px;color:var(--text-dim);line-height:1.8;">Scroll down and tap <strong style="color:var(--text);">Add to Home Screen</strong></div>
-          </div>
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <div style="font-family:var(--font-d);font-size:22px;font-weight:300;color:var(--gold-dim);min-width:24px;">4</div>
-            <div style="font-size:12px;color:var(--text-dim);line-height:1.8;">Tap <strong style="color:var(--text);">Add</strong> in the top right &mdash; Seed is on your home screen</div>
-          </div>
-        </div>
-        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
-          <div style="font-size:10px;color:var(--text-dimmer);letter-spacing:0.08em;">iPhone uses API mode. Set your Anthropic key inside the app after install.</div>
-        </div>
-      </div>
-
-    </div>
-
-    <div style="margin-top:24px;padding:16px 20px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-      <div style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;flex-shrink:0;"></div>
-      <div style="font-size:11px;color:var(--text-dim);line-height:1.8;flex:1;">After install: Seed runs in full screen with no browser chrome. Data is encrypted on your device. Works offline after first load. R1-v3 on Android, API mode on iPhone.</div>
-    </div>
-  </div>
-</div>
-
-
-<footer>
-  <div class="footer-logo">Seed</div>
-  <div class="footer-copy">Built by Red — Independent — Constitutional — Yours to build on.</div>
-</footer>
-
+<!-- Landing page removed -->
 
 </div>
 
@@ -1491,9 +1228,6 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
         <div class="sni" onclick="showAppView('organize')" id="sni-organize"><span class="sni-icon">&#127968;</span><span class="sni-label">Organize</span></div>
         <div class="sni" onclick="showAppView('groceries')" id="sni-groceries"><span class="sni-icon">&#128722;</span><span class="sni-label">Groceries</span></div>
         <div style="font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-dimmer);padding:12px 14px 6px;margin-top:4px;">Home</div>
-        <div class="sni" onclick="showAppView('files')" id="sni-files"><span class="sni-icon">&#128196;</span><span class="sni-label">Files</span></div>
-        <div class="sni" onclick="showAppView('organize')" id="sni-organize"><span class="sni-icon">&#128218;</span><span class="sni-label">Organize</span></div>
-        <div class="sni" onclick="showAppView('groceries')" id="sni-groceries"><span class="sni-icon">&#127822;</span><span class="sni-label">Groceries</span></div>
         <div class="sni" onclick="showAppView('whiteboard')" id="sni-whiteboard"><span class="sni-icon">&#9998;</span><span class="sni-label">Whiteboard</span></div>
       </div>
       <div style="flex:1;"></div>
@@ -1655,7 +1389,7 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
           <iframe id="animSandbox"
             sandbox="allow-scripts"
             style="flex:1;width:100%;border:none;background:var(--bg);"
-            srcdoc="<!DOCTYPE html><html><head><style>body{margin:0;background:#090907;color:#e8e4d9;font-family:IBM Plex Mono,monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;font-size:12px;}</style></head><body><div style='color:#5a5a58;letter-spacing:0.2em;'>CANVAS READY</div></body></html>">
+            srcdoc="<!DOCTYPE html><html><head><style>body{margin:0;background:#090907;color:#e8e4d9;font-family:Courier New,monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;font-size:12px;}</style><\/head><body><div style='color:#5a5a58;letter-spacing:0.2em;'>CANVAS READY<\/div><\/body><\/html>">
           </iframe>
           <div id="canvasError" style="display:none;position:absolute;bottom:0;left:0;right:0;background:#1a0a0a;border-top:1px solid var(--red-dim);color:var(--red);font-size:10px;padding:8px 14px;font-family:var(--font-m);"></div>
         </div>
@@ -1803,172 +1537,17 @@ button, .ni, .sni, .dcard, .dash-card, .irow, .tcard, .pcard, .proj-card, a {
       <!-- ============================================================
            FILES VIEW
            ============================================================ -->
-      <div class="appview" id="av-files">
-        <div class="avhead">
-          <div class="avtitle"><em>Files</em></div>
-          <div class="avacts">
-            <button class="avbtn primary" onclick="document.getElementById('filePickerMain').click()">+ Upload</button>
-          </div>
-        </div>
-        <div class="avbody">
-          <div class="upload-zone" id="filesDropZone"
-            ondragover="event.preventDefault();this.classList.add('dragover')"
-            ondragleave="this.classList.remove('dragover')"
-            ondrop="handleFileDrop(event,'files')">
-            <input type="file" id="filePickerMain" multiple
-              accept="image/*,.pdf,.txt,.md,.csv,.json,.js,.py,.docx,.xlsx,.xls,.mp3,.mp4,.wav"
-              onchange="handleFileInputChange(this.files,'files')">
-            <div class="upload-zone-icon">&#8679;</div>
-            <div class="upload-zone-label">Drag files here or tap to upload</div>
-            <div class="upload-zone-types">Images &bull; PDF &bull; Word &bull; Excel &bull; Text &bull; Code &bull; CSV</div>
-            <div class="upload-zone-types" style="margin-top:4px;color:var(--text-dimmer);opacity:0.5;">Audio &bull; Video (first frame extracted)</div>
-          </div>
-          <div id="filesProcessing" style="display:none;margin-top:8px;">
-            <div class="processing-label" id="filesProcessingLabel">Reading file...</div>
-            <div class="processing-bar"></div>
-          </div>
-          <div style="margin-top:16px;" id="filesList"></div>
-        </div>
-      </div>
+      
 
       <!-- ============================================================
            ORGANIZE VIEW
            ============================================================ -->
-      <div class="appview" id="av-organize">
-        <div class="avhead">
-          <div class="avtitle"><em>Organize</em></div>
-          <div class="avacts">
-            <button class="avbtn" onclick="clearOrganize()">Clear</button>
-          </div>
-        </div>
-        <div class="avbody">
-          <div style="font-size:11px;color:var(--text-dimmer);line-height:1.9;margin-bottom:16px;">
-            Take a photo of any cluttered space. The AI identifies every visible item, creates a detailed reorganization layout, and gives you a downloadable step-by-step guide.
-          </div>
-          <div class="upload-zone" id="organizeDropZone"
-            ondragover="event.preventDefault();this.classList.add('dragover')"
-            ondragleave="this.classList.remove('dragover')"
-            ondrop="handleFileDrop(event,'organize')">
-            <input type="file" id="organizeFilePicker" accept="image/*"
-              onchange="handleFileInputChange(this.files,'organize')">
-            <div class="upload-zone-icon">&#127968;</div>
-            <div class="upload-zone-label">Upload a photo of the room or space</div>
-            <div class="upload-zone-types">JPG &bull; PNG &bull; HEIC &bull; WEBP</div>
-          </div>
-          <div id="organizeProcessing" style="display:none;margin-top:8px;">
-            <div class="processing-label">Analyzing room &mdash; identifying all items...</div>
-            <div class="processing-bar"></div>
-          </div>
-          <div id="organizePreview" style="display:none;margin-top:12px;">
-            <img id="organizeImg" style="width:100%;max-height:220px;object-fit:cover;border:1px solid var(--border);" alt="Room photo">
-          </div>
-          <div id="organizeResult" style="display:none;margin-top:16px;">
-            <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px;">
-              <button class="avbtn" onclick="downloadOrganizeGuide('txt')">&#8595; Text Guide</button>
-              <button class="avbtn primary" onclick="downloadOrganizeGuide('pdf')">&#8595; PDF Guide</button>
-            </div>
-            <div class="organize-split">
-              <div>
-                <div class="organize-panel">
-                  <div class="organize-panel-title">Items Found</div>
-                  <div class="organize-items" id="organizeItemList"></div>
-                </div>
-              </div>
-              <div>
-                <div class="organize-panel">
-                  <div class="organize-panel-title">Suggested Layout</div>
-                  <div class="organize-ascii" id="organizeLayout"></div>
-                </div>
-              </div>
-            </div>
-            <div class="organize-panel" style="margin-top:12px;">
-              <div class="organize-panel-title">Step-by-Step Guide</div>
-              <div id="organizeSteps"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+      
 
       <!-- ============================================================
            GROCERIES VIEW
            ============================================================ -->
-      <div class="appview" id="av-groceries">
-        <div class="avhead">
-          <div class="avtitle"><em>Groceries</em></div>
-          <div class="avacts">
-            <button class="avbtn" onclick="showGroceryTab('inventory')">Inventory</button>
-            <button class="avbtn" onclick="showGroceryTab('meals')">Meals</button>
-            <button class="avbtn primary" onclick="showGroceryTab('add')">+ Add Photo</button>
-          </div>
-        </div>
-        <div class="avbody">
-
-          <!-- ADD TAB: photo upload to add groceries -->
-          <div id="grocery-tab-add">
-            <div style="font-size:11px;color:var(--text-dimmer);line-height:1.9;margin-bottom:12px;">
-              Take a photo of your groceries. The AI identifies and categorizes every item and adds them to your inventory.
-            </div>
-            <div class="upload-zone" id="groceryAddZone"
-              ondragover="event.preventDefault();this.classList.add('dragover')"
-              ondragleave="this.classList.remove('dragover')"
-              ondrop="handleFileDrop(event,'grocery-add')">
-              <input type="file" id="groceryAddPicker" accept="image/*"
-                onchange="handleFileInputChange(this.files,'grocery-add')">
-              <div class="upload-zone-icon">&#128722;</div>
-              <div class="upload-zone-label">Photo of groceries to add to inventory</div>
-            </div>
-            <div id="groceryAddProcessing" style="display:none;margin-top:8px;">
-              <div class="processing-label">Identifying groceries...</div>
-              <div class="processing-bar"></div>
-            </div>
-            <div id="groceryAddResult" style="display:none;margin-top:12px;"></div>
-
-            <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
-              <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-dimmer);margin-bottom:10px;">Track Usage</div>
-              <div style="font-size:11px;color:var(--text-dimmer);line-height:1.9;margin-bottom:10px;">
-                Gather the ingredients you used. Take a photo and the AI removes them from your inventory.
-              </div>
-              <div class="upload-zone" id="groceryUsageZone"
-                ondragover="event.preventDefault();this.classList.add('dragover')"
-                ondragleave="this.classList.remove('dragover')"
-                ondrop="handleFileDrop(event,'grocery-usage')">
-                <input type="file" id="groceryUsagePicker" accept="image/*"
-                  onchange="handleFileInputChange(this.files,'grocery-usage')">
-                <div class="upload-zone-icon">&#9940;</div>
-                <div class="upload-zone-label">Photo of used ingredients to remove from inventory</div>
-              </div>
-              <div id="groceryUsageProcessing" style="display:none;margin-top:8px;">
-                <div class="processing-label">Identifying used items...</div>
-                <div class="processing-bar"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- INVENTORY TAB -->
-          <div id="grocery-tab-inventory" style="display:none;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-              <div style="font-size:10px;color:var(--text-dimmer);" id="groceryCount">0 items</div>
-              <button class="avbtn" onclick="clearGroceries()">Clear All</button>
-            </div>
-            <div id="groceryInventory"></div>
-          </div>
-
-          <!-- MEALS TAB -->
-          <div id="grocery-tab-meals" style="display:none;">
-            <div style="margin-bottom:12px;">
-              <button class="avbtn primary" style="width:100%;" onclick="getMealSuggestions()">
-                &#127859; Suggest Meals from Current Inventory
-              </button>
-            </div>
-            <div id="mealProcessing" style="display:none;margin-bottom:8px;">
-              <div class="processing-label">Finding meals you can make...</div>
-              <div class="processing-bar"></div>
-            </div>
-            <div id="mealResults"></div>
-          </div>
-
-        </div>
-      </div>
+      
 
 
       <!-- FAMILY VIEW -->
@@ -2332,11 +1911,7 @@ function showInstallFromLanding(platform) {
   if (banner.scrollIntoView) banner.scrollIntoView({behavior:'smooth', block:'end'});
 }
 
-if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/Seed/sw.js').catch(function() {});
-  });
-}
+// SW registration disabled - cache was causing issues
 
 
 // -----------------------------------------------------------
@@ -2416,7 +1991,7 @@ async function loadAD() {
 }
 
 // -- UNLOCK ---------------------------------------------------
-async async function doUnlock() {
+async function doUnlock() {
   const pw = document.getElementById('lockPw').value;
   if (!pw) return;
   CK = await deriveKey(pw);
@@ -2492,17 +2067,22 @@ function updateAppGreeting() {
   if (jd) jd.textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
 }
 function showAppView(name) {
-  document.  // Render view-specific data
-  if(name==='files'){if(typeof renderFiles==='function')renderFiles();}
-  if(name==='groceries'){if(typeof renderGroceries==='function')renderGroceries();}
-  if(name==='inventory'){if(typeof renderGroceries==='function')renderGroceries();}
-  querySelectorAll('.appview').forEach(v=>v.classList.remove('active'));
-  document.querySelectorAll('.sni').forEach(n=>n.classList.remove('active'));
-  const v = document.getElementById('av-'+name);
-  const n = document.getElementById('sni-'+name);
+  // Hide all views, deactivate all sidebar items
+  document.querySelectorAll('.appview').forEach(function(v){ v.classList.remove('active'); });
+  document.querySelectorAll('.sni').forEach(function(n){ n.classList.remove('active'); });
+  var v = document.getElementById('av-'+name);
+  var n = document.getElementById('sni-'+name);
   if (v) v.classList.add('active');
   if (n) n.classList.add('active');
-  if (window.innerWidth<=600) document.getElementById('appSidebar').classList.remove('mob-open');
+  // Render view-specific data
+  if (name==='files') { if(typeof renderFiles==='function') renderFiles(); }
+  if (name==='groceries') { if(typeof renderGroceries==='function') renderGroceries(); showGroceryTab('add'); }
+  if (name==='library') { if(typeof renderLibrary==='function') renderLibrary(); }
+  if (name==='researcher') { if(typeof renderRecentResearch==='function') renderRecentResearch(); }
+  if (name==='home') { if(typeof renderAppDash==='function') renderAppDash(); }
+  // Close sidebar on mobile
+  var sb = document.getElementById('appSidebar');
+  if (sb && window.innerWidth<=600) sb.classList.remove('mob-open');
 }
 function toggleAppSidebar() {
   const s = document.getElementById('appSidebar');
@@ -3861,7 +3441,7 @@ function runDeconstruction() {
         result = await localGenerate([{role:'user', content: DECON_PROMPT}]);
       } else {
         if (!hasApiKey()) { showAppToast('Add API key first'); return; }
-        var resp = awaitmax_tokens: 4096,pi.anthropic.com/v1/messages', {
+        var resp = await fetch('https://api.anthropic.com/v1/messages', {
           method:'POST',
           headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
           body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,messages:[{role:'user',content:DECON_PROMPT}]})
@@ -3968,7 +3548,7 @@ function runResearch() {
       if (LOCAL_AI_MODE === 'local' && LOCAL_AI_LOADED) {
         text = await localGenerate([{role:'user', content: RESEARCH_PROMPT}]);
       } else {
-        var resp = awaitmax_tokens: 4096,pi.anthropic.com/v1/messages', {
+        var resp = await fetch('https://api.anthropic.com/v1/messages', {
           method:'POST',
           headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
           body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:RESEARCH_PROMPT}]})
@@ -4092,7 +3672,7 @@ function orchestrateToCanvas(entries) {
         html = await localGenerate([{role:'user',content:ORCH_PROMPT}]);
       } else {
         if (!hasApiKey()) { showAppToast('Add API key to use Canvas'); return; }
-        var resp = awaitmax_tokens: 4096,pi.anthropic.com/v1/messages', {
+        var resp = await fetch('https://api.anthropic.com/v1/messages', {
           method:'POST',
           headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
           body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:ORCH_PROMPT}]})
@@ -4153,7 +3733,9 @@ function clearCanvas() {
   CANVAS_HTML = '';
   CANVAS_ERRORS = [];
   var frame = document.getElementById('animSandbox');
-  if (frame) frame.srcdoc = '<!DOCTYPE html><html><head><style>body{margin:0;background:#090907;color:#e8e4d9;font-family:Courier New,monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;font-size:12px;}</style></head><body><div style="color:#5a5a58;letter-spacing:0.2em;">CANVAS READY</div></body></html>';
+  if (frame) {
+    frame.srcdoc = '<!DOCTYPE html><html><head><style>body{margin:0;background:#090907;color:#e8e4d9;font-family:Courier New,monospace;display:flex;align-items:center;justify-content:center;min-height:100vh;font-size:12px;}<\/style><\/head><body><div style="color:#5a5a58;letter-spacing:0.2em;">CANVAS READY<\/div><\/body><\/html>';
+  }
   var status = document.getElementById('canvasStatus');
   if (status) status.textContent = '';
   var errEl = document.getElementById('canvasError');
@@ -7488,6 +7070,9 @@ function launchDirect() {
   if (app) {
     app.style.display = 'flex';
   }
+  // Remove loading screen
+  var loader = document.getElementById('seedLoader');
+  if (loader) loader.style.display = 'none';
   initApp();
 }
 
@@ -7521,9 +7106,19 @@ function handleViewParam() {
 
 // Run on DOM ready
 document.addEventListener('DOMContentLoaded', function() {
-  initSaveHook();
-  handleViewParam();
-  autoStart();
+  try {
+    initSaveHook();
+    handleViewParam();
+    autoStart();
+  } catch(e) {
+    // Show error visibly on black screen
+    document.body.style.background = '#090907';
+    document.body.style.color = '#c8a96e';
+    document.body.style.fontFamily = 'monospace';
+    document.body.style.padding = '20px';
+    document.body.innerHTML = '<h2>Seed - Error on startup</h2><pre style="color:#e8e4d9;font-size:11px;white-space:pre-wrap;">' + e.message + '\n\n' + (e.stack || '') + '</pre><button onclick="localStorage.clear();location.reload()" style="background:#c8a96e;color:#090907;border:none;padding:12px 24px;cursor:pointer;margin-top:20px;font-size:14px;">Clear Data & Retry</button>';
+    console.error('Seed startup error:', e);
+  }
 });
 
 
@@ -7588,6 +7183,33 @@ function removeLock() {
 
 
 <!-- Install banner removed - no longer blocks launch -->
+
+
+<!-- External libraries loaded ASYNC - do not block initial render -->
+<script async src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script async src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
+<!-- WebLLM for local AI (R1-v3) - loads async after page renders -->
+<script type="module">
+  try {
+    import('https://esm.run/@mlc-ai/web-llm').then(function(webllm) {
+      window.WebLLM = webllm;
+      window.WebLLMReady = true;
+      document.dispatchEvent(new CustomEvent('webllm-ready'));
+      console.log('WebLLM loaded');
+    }).catch(function(e) {
+      console.log('WebLLM load failed:', e.message);
+      window.WebLLMReady = false;
+    });
+  } catch(e) {
+    console.log('WebLLM not available:', e.message);
+    window.WebLLMReady = false;
+  }
+</script>
 
 </body>
 </html>
